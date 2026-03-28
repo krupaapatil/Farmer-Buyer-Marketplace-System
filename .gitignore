@@ -1,0 +1,6 @@
+out/
+.tools/
+*.log
+*.class
+Thumbs.db
+.DS_Store

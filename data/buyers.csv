@@ -1,0 +1,6 @@
+id,name,city,phone,requiredCrop,requiredQuantity,maxBudget
+B201,Fresh Foods,Ahmedabad,9000001111,Wheat,100,25.0
+B202,Green Basket,Surat,9000002222,Potato,250,18.0
+B203,Urban Mart,Vadodara,9000003333,Cotton,120,50.0
+B204,City Traders,Ahmedabad,9000004444,Tomato,60,20.0
+B205,Rice Depot,Rajkot,9000005555,Rice,180,32.0

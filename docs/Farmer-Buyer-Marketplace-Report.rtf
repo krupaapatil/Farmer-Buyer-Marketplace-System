@@ -1,0 +1,916 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Times New Roman;}{\f1 Consolas;}}
+\fs24
+\pard\qc\b\fs36 Farmer-Buyer Marketplace System\b0\fs24\par
+\pard \par
+\pard\b\fs30 Detailed Project Report\b0\fs24\par
+\pard \par
+\pard\b\fs27 1. Introduction\b0\fs24\par
+\pard \par
+\pard This project, **Farmer-Buyer Marketplace System**, was developed as an undergraduate Java project to demonstrate both **core Java programming** and **Object-Oriented Programming concepts** in a practical and meaningful way.\par
+\pard \par
+\pard The main idea behind the project is simple and socially relevant: farmers often have crops available for sale, while buyers are looking for crops within a certain budget and location. This system acts like a digital bridge between the two. It stores farmer and buyer information, compares their needs and offerings, and recommends the best matches based on:\par
+\pard \par
+\pard\li720 ? crop availability\par
+\pard\li720 ? budget compatibility\par
+\pard\li720 ? same-city proximity\par
+\pard\li720 ? quantity closeness\par
+\pard \par
+\pard The project was intentionally designed to be **academic, understandable, and presentable**. Instead of making it overly complicated, the system focuses on clearly demonstrating syllabus topics through a realistic application.\par
+\pard \par
+\pard This project now supports:\par
+\pard \par
+\pard\li720 ? a **Java Swing desktop application**\par
+\pard\li720 ? a **browser-based web version**\par
+\pard\li720 ? **CSV file storage**\par
+\pard\li720 ? **serialized backup**\par
+\pard\li720 ? **UML documentation**\par
+\pard \par
+\pard So it is both technically complete and strong from a report/viva point of view.\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 2. Problem Statement\b0\fs24\par
+\pard \par
+\pard Farmers and buyers usually depend on middlemen, manual communication, or scattered marketplaces. Because of this, it can be difficult for:\par
+\pard \par
+\pard\li720 ? farmers to find the right buyers\par
+\pard\li720 ? buyers to locate suitable sellers quickly\par
+\pard\li720 ? both parties to compare crop type, budget, and location efficiently\par
+\pard \par
+\pard This project solves that problem by creating a small marketplace system that:\par
+\pard \par
+\pard 1. stores farmer details\par
+\pard 2. stores buyer requirements\par
+\pard 3. compares both sets of data\par
+\pard 4. generates suitable recommendations\par
+\pard 5. saves and loads data from files\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 3. Objectives of the Project\b0\fs24\par
+\pard \par
+\pard The main objectives of this project are:\par
+\pard \par
+\pard\li720 ? to build a meaningful Java application based on a real-world idea\par
+\pard\li720 ? to cover the full undergraduate Java syllabus in one project\par
+\pard\li720 ? to show clear use of OOP concepts like inheritance, abstraction, interfaces, and polymorphism\par
+\pard\li720 ? to demonstrate file handling, exception handling, and data persistence\par
+\pard\li720 ? to provide an easy-to-use interface for demonstration and evaluation\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 4. Scope of the Project\b0\fs24\par
+\pard \par
+\pard The current system supports:\par
+\pard \par
+\pard\li720 ? adding farmer records\par
+\pard\li720 ? adding buyer records\par
+\pard\li720 ? viewing all saved records\par
+\pard\li720 ? searching by crop and city\par
+\pard\li720 ? generating matches for one buyer or all buyers\par
+\pard\li720 ? saving data to CSV files\par
+\pard\li720 ? loading data from CSV files\par
+\pard\li720 ? exporting match reports\par
+\pard\li720 ? creating and restoring serialized backups\par
+\pard \par
+\pard The project does **not** currently include:\par
+\pard \par
+\pard\li720 ? online payments\par
+\pard\li720 ? user login and authentication\par
+\pard\li720 ? database integration\par
+\pard\li720 ? real GPS distance calculation\par
+\pard\li720 ? advanced analytics\par
+\pard \par
+\pard These were kept outside scope so that the project remains suitable for undergraduate academic evaluation.\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 5. Technologies Used\b0\fs24\par
+\pard \par
+\pard\li720 ? **Java**\par
+\pard   - main programming language\par
+\pard\li720 ? **Java Swing**\par
+\pard   - desktop GUI\par
+\pard\li720 ? **Java HTTP Server**\par
+\pard   - lightweight built-in web server for browser access\par
+\pard\li720 ? **CSV Files**\par
+\pard   - text-based persistent storage\par
+\pard\li720 ? **Object Streams**\par
+\pard   - serialized backup storage\par
+\pard\li720 ? **PlantUML**\par
+\pard   - UML diagram source files\par
+\pard\li720 ? **PowerShell**\par
+\pard   - project run script\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 6. Project Workflow\b0\fs24\par
+\pard \par
+\pard This section explains the workflow in human terms.\par
+\pard \par
+\pard\b 6.1 Farmer workflow\b0\par
+\pard \par
+\pard 1. A user opens the Farmer section.\par
+\pard 2. The user enters:\par
+\pard    - farmer ID\par
+\pard    - name\par
+\pard    - city\par
+\pard    - phone\par
+\pard    - crop type\par
+\pard    - quantity available\par
+\pard    - price per unit\par
+\pard 3. The UI creates a `Farmer` object.\par
+\pard 4. The object is validated through constructors and setters.\par
+\pard 5. The manager checks whether the ID is unique.\par
+\pard 6. If valid, the farmer is added to the system.\par
+\pard 7. The table refreshes and shows the new farmer.\par
+\pard \par
+\pard\b 6.2 Buyer workflow\b0\par
+\pard \par
+\pard 1. A user opens the Buyer section.\par
+\pard 2. The user enters:\par
+\pard    - buyer ID\par
+\pard    - name\par
+\pard    - city\par
+\pard    - phone\par
+\pard    - required crop\par
+\pard    - required quantity\par
+\pard    - maximum budget\par
+\pard 3. The UI creates a `Buyer` object.\par
+\pard 4. Validation is performed.\par
+\pard 5. Duplicate ID checks are performed.\par
+\pard 6. If successful, the buyer is stored and displayed.\par
+\pard \par
+\pard\b 6.3 Matching workflow\b0\par
+\pard \par
+\pard 1. The user chooses a buyer or selects the option to generate all matches.\par
+\pard 2. The system loops through farmers.\par
+\pard 3. For each farmer, the system checks:\par
+\pard    - is the crop the same?\par
+\pard    - is the city the same?\par
+\pard    - is the price within the buyer's budget?\par
+\pard    - is quantity available greater than zero?\par
+\pard 4. If compatible, the system calculates a match score.\par
+\pard 5. A `MatchRecord` object is created.\par
+\pard 6. All compatible matches are sorted by score.\par
+\pard 7. The best matches are shown in the table and report area.\par
+\pard \par
+\pard\b 6.4 File workflow\b0\par
+\pard \par
+\pard 1. When the user clicks save, farmer data, buyer data, and match data are written to CSV files.\par
+\pard 2. When the user clicks load, the system reads those files line by line.\par
+\pard 3. CSV values are converted back into `Farmer` and `Buyer` objects.\par
+\pard 4. If there is any invalid data, a custom exception is raised.\par
+\pard 5. Backup and restore use object streams to serialize and deserialize the full state.\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 7. Package Structure\b0\fs24\par
+\pard \par
+\pard The project is organized into packages so that each responsibility stays clear.\par
+\pard \par
+\pard\b 7.1 `farmmarket.app`\b0\par
+\pard \par
+\pard Contains the main starting point of the application.\par
+\pard \par
+\pard\li720 ? `FarmerBuyerMarketplaceApp`\par
+\pard \par
+\pard\b 7.2 `farmmarket.model`\b0\par
+\pard \par
+\pard Contains all domain classes and data objects.\par
+\pard \par
+\pard\li720 ? `User`\par
+\pard\li720 ? `Farmer`\par
+\pard\li720 ? `Buyer`\par
+\pard\li720 ? `MatchRecord`\par
+\pard\li720 ? `MarketplaceBackup`\par
+\pard \par
+\pard\b 7.3 `farmmarket.interfaces`\b0\par
+\pard \par
+\pard Contains behavior contracts.\par
+\pard \par
+\pard\li720 ? `Persistable`\par
+\pard\li720 ? `Matchable`\par
+\pard \par
+\pard\b 7.4 `farmmarket.service`\b0\par
+\pard \par
+\pard Contains the business logic and file management.\par
+\pard \par
+\pard\li720 ? `MarketplaceManager`\par
+\pard\li720 ? `FileManager`\par
+\pard \par
+\pard\b 7.5 `farmmarket.util`\b0\par
+\pard \par
+\pard Contains supporting utility code.\par
+\pard \par
+\pard\li720 ? `AppConstants`\par
+\pard\li720 ? `ValidationUtil`\par
+\pard\li720 ? `ReportGenerator`\par
+\pard \par
+\pard\b 7.6 `farmmarket.exceptions`\b0\par
+\pard \par
+\pard Contains custom exception classes.\par
+\pard \par
+\pard\li720 ? `InvalidDataException`\par
+\pard\li720 ? `DuplicateIdException`\par
+\pard\li720 ? `NoMatchFoundException`\par
+\pard \par
+\pard\b 7.7 `farmmarket.ui`\b0\par
+\pard \par
+\pard Contains the desktop user interface.\par
+\pard \par
+\pard\li720 ? `MainFrame`\par
+\pard\li720 ? `FarmerPanel`\par
+\pard\li720 ? `BuyerPanel`\par
+\pard\li720 ? `MatchPanel`\par
+\pard\li720 ? `ReportsPanel`\par
+\pard \par
+\pard\b 7.8 `farmmarket.web`\b0\par
+\pard \par
+\pard Contains the web server and API code.\par
+\pard \par
+\pard\li720 ? `MarketplaceWebServer`\par
+\pard\li720 ? `ApiHandler`\par
+\pard\li720 ? `StaticFileHandler`\par
+\pard\li720 ? `HttpUtil`\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 8. Class-by-Class Explanation\b0\fs24\par
+\pard \par
+\pard This section is the heart of the report. It explains what each class contains and why it exists.\par
+\pard \par
+\pard\b 8.1 `User`\b0\par
+\pard \par
+\pard File: [User.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/model/User.java)\par
+\pard \par
+\pard This is the **abstract parent class** for all people in the system.\par
+\pard \par
+\pard It contains private fields:\par
+\pard \par
+\pard\li720 ? `id`\par
+\pard\li720 ? `name`\par
+\pard\li720 ? `city`\par
+\pard\li720 ? `phone`\par
+\pard \par
+\pard It also provides:\par
+\pard \par
+\pard\li720 ? getters and setters\par
+\pard\li720 ? built-in validation through setter methods\par
+\pard\li720 ? abstract methods:\par
+\pard   - `getRole()`\par
+\pard   - `displayDetails()`\par
+\pard   - `toTableRow()`\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? avoids duplication\par
+\pard\li720 ? demonstrates abstraction\par
+\pard\li720 ? demonstrates inheritance\par
+\pard\li720 ? demonstrates encapsulation\par
+\pard \par
+\pard In simple words, `User` defines the common identity of a person in the system, while leaving specific behavior to subclasses.\par
+\pard \par
+\pard\b 8.2 `Farmer`\b0\par
+\pard \par
+\pard File: [Farmer.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/model/Farmer.java)\par
+\pard \par
+\pard This class extends `User` and implements `Matchable`.\par
+\pard \par
+\pard Additional fields:\par
+\pard \par
+\pard\li720 ? `cropType`\par
+\pard\li720 ? `quantityAvailable`\par
+\pard\li720 ? `pricePerUnit`\par
+\pard \par
+\pard Important methods:\par
+\pard \par
+\pard\li720 ? overloaded constructors\par
+\pard\li720 ? `isCompatibleWith(Buyer buyer)`\par
+\pard\li720 ? `calculateMatchScore(Buyer buyer)`\par
+\pard\li720 ? overridden `displayDetails()`\par
+\pard\li720 ? overridden `toString()`\par
+\pard\li720 ? overridden `toCsv()`\par
+\pard\li720 ? overridden `toTableRow()`\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? represents a real seller in the marketplace\par
+\pard\li720 ? contains the logic for compatibility and scoring\par
+\pard\li720 ? demonstrates inheritance, interface implementation, and overriding\par
+\pard \par
+\pard This is one of the most important classes because it combines data and behavior in a clean OOP style.\par
+\pard \par
+\pard\b 8.3 `Buyer`\b0\par
+\pard \par
+\pard File: [Buyer.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/model/Buyer.java)\par
+\pard \par
+\pard This class also extends `User`.\par
+\pard \par
+\pard Additional fields:\par
+\pard \par
+\pard\li720 ? `requiredCrop`\par
+\pard\li720 ? `requiredQuantity`\par
+\pard\li720 ? `maxBudget`\par
+\pard \par
+\pard Important methods:\par
+\pard \par
+\pard\li720 ? overloaded constructors\par
+\pard\li720 ? overridden `displayDetails()`\par
+\pard\li720 ? overridden `toString()`\par
+\pard\li720 ? overridden `toCsv()`\par
+\pard\li720 ? overridden `toTableRow()`\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? represents demand in the marketplace\par
+\pard\li720 ? stores the exact crop and budget requirements needed for matching\par
+\pard \par
+\pard Together, `Farmer` and `Buyer` show how a parent class can be specialized in two different ways.\par
+\pard \par
+\pard\b 8.4 `MatchRecord`\b0\par
+\pard \par
+\pard File: [MatchRecord.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/model/MatchRecord.java)\par
+\pard \par
+\pard This class stores the result of a successful farmer-buyer comparison.\par
+\pard \par
+\pard Fields include:\par
+\pard \par
+\pard\li720 ? buyer ID and buyer name\par
+\pard\li720 ? farmer ID and farmer name\par
+\pard\li720 ? crop type\par
+\pard\li720 ? city\par
+\pard\li720 ? available quantity\par
+\pard\li720 ? price per unit\par
+\pard\li720 ? score\par
+\pard\li720 ? status\par
+\pard \par
+\pard Important features:\par
+\pard \par
+\pard\li720 ? implements `Persistable`\par
+\pard\li720 ? implements `Comparable<MatchRecord>`\par
+\pard\li720 ? contains `toTableRow()`\par
+\pard\li720 ? contains `toCsv()`\par
+\pard\li720 ? defines `compareTo()` for score-based sorting\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? separates match result data from raw farmer and buyer data\par
+\pard\li720 ? allows sorting of matches in descending score order\par
+\pard\li720 ? supports reporting and CSV export\par
+\pard \par
+\pard\b 8.5 `MarketplaceBackup`\b0\par
+\pard \par
+\pard File: [MarketplaceBackup.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/model/MarketplaceBackup.java)\par
+\pard \par
+\pard This class stores:\par
+\pard \par
+\pard\li720 ? all farmers\par
+\pard\li720 ? all buyers\par
+\pard\li720 ? all last-generated matches\par
+\pard \par
+\pard It implements `Serializable`.\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? allows backup using object streams\par
+\pard\li720 ? demonstrates object-level persistence\par
+\pard\li720 ? keeps backup logic clean and separate from the manager\par
+\pard \par
+\pard\b 8.6 `Persistable`\b0\par
+\pard \par
+\pard File: [Persistable.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/interfaces/Persistable.java)\par
+\pard \par
+\pard This interface contains one method:\par
+\pard \par
+\pard\li720 ? `toCsv()`\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? ensures objects that can be saved know how to convert themselves into CSV format\par
+\pard\li720 ? demonstrates interface-based design\par
+\pard \par
+\pard\b 8.7 `Matchable`\b0\par
+\pard \par
+\pard File: [Matchable.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/interfaces/Matchable.java)\par
+\pard \par
+\pard This interface contains:\par
+\pard \par
+\pard\li720 ? `isCompatibleWith(Buyer buyer)`\par
+\pard\li720 ? `calculateMatchScore(Buyer buyer)`\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? defines the behavior required for any class that can participate in matching\par
+\pard\li720 ? is implemented by `Farmer`\par
+\pard \par
+\pard This is a nice example of behavior abstraction.\par
+\pard \par
+\pard\b 8.8 `MarketplaceManager`\b0\par
+\pard \par
+\pard File: [MarketplaceManager.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/service/MarketplaceManager.java)\par
+\pard \par
+\pard This is the **central business logic class**.\par
+\pard \par
+\pard It stores:\par
+\pard \par
+\pard\li720 ? list of farmers\par
+\pard\li720 ? list of buyers\par
+\pard\li720 ? list of last generated matches\par
+\pard \par
+\pard It performs:\par
+\pard \par
+\pard\li720 ? adding farmers\par
+\pard\li720 ? adding buyers\par
+\pard\li720 ? searching farmers\par
+\pard\li720 ? searching buyers\par
+\pard\li720 ? generating matches\par
+\pard\li720 ? generating all matches\par
+\pard\li720 ? loading and saving through `FileManager`\par
+\pard\li720 ? exporting and importing backup\par
+\pard\li720 ? generating reports\par
+\pard\li720 ? duplicate ID checking\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? it keeps business logic away from the UI\par
+\pard\li720 ? it acts like the brain of the application\par
+\pard\li720 ? it demonstrates loops, conditions, collections, exceptions, and overloading\par
+\pard \par
+\pard If someone asks for the most important class in the project, `MarketplaceManager` is a very strong answer.\par
+\pard \par
+\pard\b 8.9 `FileManager`\b0\par
+\pard \par
+\pard File: [FileManager.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/service/FileManager.java)\par
+\pard \par
+\pard This class handles persistence.\par
+\pard \par
+\pard Responsibilities:\par
+\pard \par
+\pard\li720 ? save farmers to CSV\par
+\pard\li720 ? save buyers to CSV\par
+\pard\li720 ? save matches to CSV\par
+\pard\li720 ? load farmers from CSV\par
+\pard\li720 ? load buyers from CSV\par
+\pard\li720 ? export serialized backup\par
+\pard\li720 ? import serialized backup\par
+\pard\li720 ? create data folder if it does not exist\par
+\pard \par
+\pard Key technical points:\par
+\pard \par
+\pard\li720 ? uses `BufferedWriter` and `FileWriter`\par
+\pard\li720 ? uses `BufferedReader` and `FileReader`\par
+\pard\li720 ? uses `ObjectOutputStream` and `ObjectInputStream`\par
+\pard\li720 ? uses `try-with-resources`\par
+\pard\li720 ? throws custom exceptions for invalid records\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? demonstrates file handling in a clean and practical way\par
+\pard\li720 ? separates persistence from UI and business logic\par
+\pard \par
+\pard\b 8.10 `AppConstants`\b0\par
+\pard \par
+\pard File: [AppConstants.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/util/AppConstants.java)\par
+\pard \par
+\pard Contains:\par
+\pard \par
+\pard\li720 ? crop array\par
+\pard\li720 ? file names\par
+\pard\li720 ? data directory constants\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? demonstrates arrays\par
+\pard\li720 ? avoids hardcoding repeated values\par
+\pard \par
+\pard\b 8.11 `ValidationUtil`\b0\par
+\pard \par
+\pard File: [ValidationUtil.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/util/ValidationUtil.java)\par
+\pard \par
+\pard Contains reusable validation methods such as:\par
+\pard \par
+\pard\li720 ? `requireNonEmpty`\par
+\pard\li720 ? `requireNonNegativeDouble`\par
+\pard\li720 ? `requireNonNegativeInt`\par
+\pard\li720 ? `requirePositiveInt`\par
+\pard\li720 ? `normalizeText`\par
+\pard\li720 ? `matchesIgnoreCase`\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? keeps validation logic reusable and centralized\par
+\pard\li720 ? improves code readability\par
+\pard\li720 ? demonstrates custom exception usage\par
+\pard \par
+\pard\b 8.12 `ReportGenerator`\b0\par
+\pard \par
+\pard File: [ReportGenerator.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/util/ReportGenerator.java)\par
+\pard \par
+\pard Generates:\par
+\pard \par
+\pard\li720 ? summary report\par
+\pard\li720 ? match report\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? keeps reporting logic separate from the UI\par
+\pard\li720 ? shows string building and formatted text generation\par
+\pard \par
+\pard\b 8.13 Exception Classes\b0\par
+\pard \par
+\pard Files:\par
+\pard \par
+\pard\li720 ? [InvalidDataException.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/exceptions/InvalidDataException.java)\par
+\pard\li720 ? [DuplicateIdException.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/exceptions/DuplicateIdException.java)\par
+\pard\li720 ? [NoMatchFoundException.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/exceptions/NoMatchFoundException.java)\par
+\pard \par
+\pard These classes are simple but important.\par
+\pard \par
+\pard They help the program communicate specific problems:\par
+\pard \par
+\pard\li720 ? invalid data entered by user or file\par
+\pard\li720 ? duplicate IDs\par
+\pard\li720 ? no compatible matches found\par
+\pard \par
+\pard Why it matters:\par
+\pard \par
+\pard\li720 ? makes error handling more professional and readable\par
+\pard\li720 ? shows custom exception creation\par
+\pard \par
+\pard\b 8.14 Swing UI Classes\b0\par
+\pard \par
+\pard ##### `MainFrame`\par
+\pard \par
+\pard File: [MainFrame.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/ui/MainFrame.java)\par
+\pard \par
+\pard Acts as the main window.\par
+\pard \par
+\pard It creates:\par
+\pard \par
+\pard\li720 ? `MarketplaceManager`\par
+\pard\li720 ? `FileManager`\par
+\pard\li720 ? `FarmerPanel`\par
+\pard\li720 ? `BuyerPanel`\par
+\pard\li720 ? `MatchPanel`\par
+\pard\li720 ? `ReportsPanel`\par
+\pard \par
+\pard It also:\par
+\pard \par
+\pard\li720 ? loads initial data\par
+\pard\li720 ? refreshes all tabs\par
+\pard\li720 ? shows status messages\par
+\pard \par
+\pard ##### `FarmerPanel`\par
+\pard \par
+\pard File: [FarmerPanel.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/ui/FarmerPanel.java)\par
+\pard \par
+\pard Contains:\par
+\pard \par
+\pard\li720 ? input form for farmer data\par
+\pard\li720 ? add/reset buttons\par
+\pard\li720 ? search controls\par
+\pard\li720 ? table display using `Vector` and `DefaultTableModel`\par
+\pard\li720 ? validation and error dialogs\par
+\pard \par
+\pard ##### `BuyerPanel`\par
+\pard \par
+\pard File: [BuyerPanel.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/ui/BuyerPanel.java)\par
+\pard \par
+\pard Contains:\par
+\pard \par
+\pard\li720 ? input form for buyer data\par
+\pard\li720 ? add/reset buttons\par
+\pard\li720 ? search controls\par
+\pard\li720 ? buyer table\par
+\pard\li720 ? exception-based validation\par
+\pard \par
+\pard ##### `MatchPanel`\par
+\pard \par
+\pard File: [MatchPanel.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/ui/MatchPanel.java)\par
+\pard \par
+\pard Contains:\par
+\pard \par
+\pard\li720 ? buyer selection combo box\par
+\pard\li720 ? match selected buyer button\par
+\pard\li720 ? generate all matches button\par
+\pard\li720 ? export matches button\par
+\pard\li720 ? match table\par
+\pard\li720 ? report text area\par
+\pard \par
+\pard This panel is especially useful during demonstration because it clearly shows the matching logic at work.\par
+\pard \par
+\pard ##### `ReportsPanel`\par
+\pard \par
+\pard File: [ReportsPanel.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/ui/ReportsPanel.java)\par
+\pard \par
+\pard Contains:\par
+\pard \par
+\pard\li720 ? save button\par
+\pard\li720 ? load button\par
+\pard\li720 ? backup button\par
+\pard\li720 ? restore button\par
+\pard\li720 ? summary report area\par
+\pard \par
+\pard This class is important for showing file handling and object stream backup features.\par
+\pard \par
+\pard\b 8.15 Web Classes\b0\par
+\pard \par
+\pard The project also contains a web version so it can be opened in browsers on laptops and phones.\par
+\pard \par
+\pard ##### `MarketplaceWebServer`\par
+\pard \par
+\pard Starts the HTTP server and binds to `0.0.0.0`.\par
+\pard \par
+\pard ##### `ApiHandler`\par
+\pard \par
+\pard Handles:\par
+\pard \par
+\pard\li720 ? farmer APIs\par
+\pard\li720 ? buyer APIs\par
+\pard\li720 ? match APIs\par
+\pard\li720 ? summary API\par
+\pard\li720 ? save/load API\par
+\pard \par
+\pard ##### `StaticFileHandler`\par
+\pard \par
+\pard Serves HTML, CSS, and JavaScript files.\par
+\pard \par
+\pard ##### `HttpUtil`\par
+\pard \par
+\pard Contains helper methods for:\par
+\pard \par
+\pard\li720 ? JSON response writing\par
+\pard\li720 ? body reading\par
+\pard\li720 ? query parsing\par
+\pard\li720 ? basic JSON escaping\par
+\pard \par
+\pard These classes are not required for the original syllabus, but they add a very useful practical extension.\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 9. How the Matching Logic Works\b0\fs24\par
+\pard \par
+\pard The matching logic is kept simple so that it is easy to explain in class.\par
+\pard \par
+\pard The method `isCompatibleWith(Buyer buyer)` in `Farmer` checks:\par
+\pard \par
+\pard 1. buyer must not be null\par
+\pard 2. crop type must match\par
+\pard 3. city must match\par
+\pard 4. price per unit must be less than or equal to buyer budget\par
+\pard 5. quantity available must be greater than zero\par
+\pard \par
+\pard If all of these are true, the buyer and farmer are considered compatible.\par
+\pard \par
+\pard Then `calculateMatchScore(Buyer buyer)` gives a score:\par
+\pard \par
+\pard\li720 ? base score starts at `80`\par
+\pard\li720 ? quantity closeness contributes up to `20`\par
+\pard\li720 ? final score is rounded to 2 decimal places\par
+\pard \par
+\pard This creates a ranked recommendation system without unnecessary complexity.\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 10. How Data Moves Through the System\b0\fs24\par
+\pard \par
+\pard The internal data flow of the project is:\par
+\pard \par
+\pard 1. UI accepts input\par
+\pard 2. Input becomes an object\par
+\pard 3. Object is validated\par
+\pard 4. Manager stores object\par
+\pard 5. Matching methods compare objects\par
+\pard 6. Result becomes `MatchRecord`\par
+\pard 7. Table and report show the result\par
+\pard 8. File manager saves data\par
+\pard \par
+\pard This separation is important because it makes the code organized:\par
+\pard \par
+\pard\li720 ? UI handles presentation\par
+\pard\li720 ? manager handles logic\par
+\pard\li720 ? models hold data\par
+\pard\li720 ? file manager handles storage\par
+\pard\li720 ? utilities support the system\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 11. Syllabus Coverage Explanation\b0\fs24\par
+\pard \par
+\pard This project covers the Java syllabus in a very natural way.\par
+\pard \par
+\pard\b 11.1 Classes and Objects\b0\par
+\pard \par
+\pard Covered through all model, manager, and UI classes.\par
+\pard \par
+\pard Examples:\par
+\pard \par
+\pard\li720 ? `Farmer farmer = new Farmer(...)`\par
+\pard\li720 ? `Buyer buyer = new Buyer(...)`\par
+\pard\li720 ? `MatchRecord match = new MatchRecord(...)`\par
+\pard \par
+\pard\b 11.2 Arrays\b0\par
+\pard \par
+\pard Covered through `AppConstants.CROP_TYPES`.\par
+\pard \par
+\pard\b 11.3 Strings\b0\par
+\pard \par
+\pard Used in IDs, crop names, city names, reports, file parsing, and UI labels.\par
+\pard \par
+\pard\b 11.4 Vectors\b0\par
+\pard \par
+\pard Used in Swing tables for rows and columns.\par
+\pard \par
+\pard\b 11.5 Operators, Loops, and Decision Making\b0\par
+\pard \par
+\pard Used in:\par
+\pard \par
+\pard\li720 ? searching\par
+\pard\li720 ? file reading\par
+\pard\li720 ? matching\par
+\pard\li720 ? validation\par
+\pard\li720 ? scoring\par
+\pard \par
+\pard\b 11.6 Encapsulation\b0\par
+\pard \par
+\pard Private fields plus getters/setters in model classes.\par
+\pard \par
+\pard\b 11.7 Constructors\b0\par
+\pard \par
+\pard Default and overloaded constructors in `Farmer` and `Buyer`.\par
+\pard \par
+\pard\b 11.8 Inheritance\b0\par
+\pard \par
+\pard `Farmer` and `Buyer` inherit from `User`.\par
+\pard \par
+\pard\b 11.9 Polymorphism\b0\par
+\pard \par
+\pard Overloading:\par
+\pard \par
+\pard\li720 ? constructors\par
+\pard\li720 ? search methods\par
+\pard \par
+\pard Overriding:\par
+\pard \par
+\pard\li720 ? `displayDetails()`\par
+\pard\li720 ? `toString()`\par
+\pard\li720 ? `toCsv()`\par
+\pard\li720 ? `toTableRow()`\par
+\pard \par
+\pard\b 11.10 Abstraction\b0\par
+\pard \par
+\pard Abstract class `User`.\par
+\pard \par
+\pard\b 11.11 Interfaces\b0\par
+\pard \par
+\pard `Persistable` and `Matchable`.\par
+\pard \par
+\pard\b 11.12 UML Diagrams\b0\par
+\pard \par
+\pard Included in the `docs/uml` folder.\par
+\pard \par
+\pard\b 11.13 File Handling and IO Streams\b0\par
+\pard \par
+\pard CSV read/write plus serialized backup.\par
+\pard \par
+\pard\b 11.14 Exception Handling\b0\par
+\pard \par
+\pard `try-catch`, `try-with-resources`, and custom exceptions.\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 12. UML Support in the Project\b0\fs24\par
+\pard \par
+\pard The project includes the following UML diagrams:\par
+\pard \par
+\pard\li720 ? use case diagram\par
+\pard\li720 ? class diagram\par
+\pard\li720 ? sequence diagram\par
+\pard\li720 ? activity diagram\par
+\pard \par
+\pard These help explain the project before even running the code.\par
+\pard \par
+\pard The class diagram is especially valuable because it shows:\par
+\pard \par
+\pard\li720 ? abstract class\par
+\pard\li720 ? interfaces\par
+\pard\li720 ? inheritance\par
+\pard\li720 ? association between manager and model classes\par
+\pard\li720 ? custom exceptions\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 13. User Interface Design\b0\fs24\par
+\pard \par
+\pard The project contains two interfaces:\par
+\pard \par
+\pard\b 13.1 Desktop interface\b0\par
+\pard \par
+\pard Built using Swing.\par
+\pard \par
+\pard Advantages:\par
+\pard \par
+\pard\li720 ? simple to demonstrate in lab\par
+\pard\li720 ? directly covers Java desktop UI concepts\par
+\pard\li720 ? visually separates farmer, buyer, matching, and reports\par
+\pard \par
+\pard\b 13.2 Web interface\b0\par
+\pard \par
+\pard Built using Java HTTP server with HTML, CSS, and JavaScript.\par
+\pard \par
+\pard Advantages:\par
+\pard \par
+\pard\li720 ? can be opened on laptops and phones\par
+\pard\li720 ? easier to share by link\par
+\pard\li720 ? improves practical usefulness\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 14. Test Scenarios Covered\b0\fs24\par
+\pard \par
+\pard The system supports testing of:\par
+\pard \par
+\pard\li720 ? valid farmer creation\par
+\pard\li720 ? valid buyer creation\par
+\pard\li720 ? invalid blank fields\par
+\pard\li720 ? negative quantity or price\par
+\pard\li720 ? duplicate IDs\par
+\pard\li720 ? file save and load\par
+\pard\li720 ? match generation with valid compatibility\par
+\pard\li720 ? no-match situations\par
+\pard\li720 ? backup creation and restoration\par
+\pard \par
+\pard This makes the project not only functional, but also easy to evaluate systematically.\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 15. Strengths of the Project\b0\fs24\par
+\pard \par
+\pard\li720 ? clearly covers syllabus topics\par
+\pard\li720 ? easy to explain during viva\par
+\pard\li720 ? realistic real-world problem\par
+\pard\li720 ? good package structure\par
+\pard\li720 ? meaningful use of OOP\par
+\pard\li720 ? file handling is practical, not artificial\par
+\pard\li720 ? includes both desktop and web versions\par
+\pard\li720 ? contains UML and documentation\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 16. Limitations\b0\fs24\par
+\pard \par
+\pard No academic project is perfect, and it is helpful to state limitations honestly.\par
+\pard \par
+\pard Current limitations include:\par
+\pard \par
+\pard\li720 ? no database\par
+\pard\li720 ? no login system\par
+\pard\li720 ? no real distance calculation\par
+\pard\li720 ? no order confirmation workflow\par
+\pard\li720 ? no payment gateway\par
+\pard\li720 ? no advanced analytics\par
+\pard \par
+\pard These limitations are acceptable because the purpose of the project is educational clarity, not commercial deployment.\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 17. Future Enhancements\b0\fs24\par
+\pard \par
+\pard In future, the project can be extended with:\par
+\pard \par
+\pard\li720 ? user login and registration\par
+\pard\li720 ? district or pincode-based matching\par
+\pard\li720 ? real map distance integration\par
+\pard\li720 ? admin dashboard\par
+\pard\li720 ? database connectivity using MySQL\par
+\pard\li720 ? order booking and status tracking\par
+\pard\li720 ? online negotiation system\par
+\pard\li720 ? analytics and demand forecasting\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 18. Conclusion\b0\fs24\par
+\pard \par
+\pard The **Farmer-Buyer Marketplace System** is a complete and meaningful Java project that successfully connects classroom concepts with a practical application.\par
+\pard \par
+\pard Instead of showing Java topics in isolation, the project uses them in a natural workflow:\par
+\pard \par
+\pard\li720 ? classes represent real entities\par
+\pard\li720 ? inheritance reduces duplication\par
+\pard\li720 ? interfaces define reusable behavior\par
+\pard\li720 ? custom exceptions improve reliability\par
+\pard\li720 ? file handling preserves data\par
+\pard\li720 ? GUI and web interface make the system interactive\par
+\pard \par
+\pard Most importantly, this project is not just technically valid, but also **humanly understandable**. A teacher, examiner, or classmate can follow the flow without difficulty. That makes it especially suitable for an undergraduate report, demonstration, and viva.\par
+\pard \par
+\par
+\pard \par
+\pard\b\fs27 19. Short Viva-Friendly Summary\b0\fs24\par
+\pard \par
+\pard If the project needs to be explained in one paragraph:\par
+\pard \par
+\pard > This project is a Java-based Farmer-Buyer Marketplace System that stores farmers and buyers, compares crop type, price, and city, and recommends the best matches. It demonstrates classes, objects, arrays, strings, vectors, constructors, inheritance, polymorphism, abstraction, interfaces, file handling, custom exceptions, and UML diagrams. The project uses a clean package structure, supports both desktop and browser interfaces, and saves data using CSV files and serialized backup.\par
+}

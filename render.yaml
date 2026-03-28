@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: farmer-buyer-marketplace
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 10000
