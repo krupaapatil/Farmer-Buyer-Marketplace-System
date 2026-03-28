@@ -1,0 +1,32 @@
+@startuml
+left to right direction
+
+actor "Farmer Entry User" as FarmerUser
+actor "Buyer Entry User" as BuyerUser
+actor "System Operator" as Operator
+
+rectangle "Farmer-Buyer Marketplace System" {
+  usecase "Add Farmer" as UC1
+  usecase "Search Farmers" as UC2
+  usecase "Add Buyer" as UC3
+  usecase "Search Buyers" as UC4
+  usecase "Generate Match" as UC5
+  usecase "Generate All Matches" as UC6
+  usecase "Save Data" as UC7
+  usecase "Load Data" as UC8
+  usecase "Export Match Report" as UC9
+  usecase "Create/Restore Backup" as UC10
+}
+
+FarmerUser --> UC1
+FarmerUser --> UC2
+BuyerUser --> UC3
+BuyerUser --> UC4
+Operator --> UC5
+Operator --> UC6
+Operator --> UC7
+Operator --> UC8
+Operator --> UC9
+Operator --> UC10
+
+@enduml

@@ -1,0 +1,6 @@
+id,name,city,phone,cropType,quantityAvailable,pricePerUnit
+F101,Ramesh Patel,Ahmedabad,9876543210,Wheat,120,22.5
+F102,Suresh Yadav,Surat,9876501234,Rice,200,30.0
+F103,Meena Sharma,Ahmedabad,9823456789,Tomato,80,18.0
+F104,Arjun Singh,Vadodara,9811122233,Cotton,150,45.5
+F105,Kiran Devi,Surat,9898989898,Potato,300,16.75

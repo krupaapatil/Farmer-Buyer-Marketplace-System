@@ -1,0 +1,22 @@
+@startuml
+actor Operator
+participant MatchPanel
+participant MarketplaceManager
+participant Buyer
+participant Farmer
+participant MatchRecord
+
+Operator -> MatchPanel : Click "Match Selected Buyer"
+MatchPanel -> MarketplaceManager : generateMatchesForBuyer(buyer)
+MarketplaceManager -> Buyer : read crop/city/budget
+loop for each farmer
+  MarketplaceManager -> Farmer : isCompatibleWith(buyer)
+  alt compatible
+    MarketplaceManager -> Farmer : calculateMatchScore(buyer)
+    MarketplaceManager -> MatchRecord : create match record
+  end
+end
+MarketplaceManager --> MatchPanel : sorted match list
+MatchPanel --> Operator : show ranked matches table
+
+@enduml

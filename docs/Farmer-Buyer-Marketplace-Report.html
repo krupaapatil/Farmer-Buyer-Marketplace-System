@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer-Buyer Marketplace Report</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 950px; margin: 40px auto; padding: 0 20px; line-height: 1.7; color: #222; }
+    h1, h2, h3, h4 { color: #1f3b2d; }
+    h1 { text-align: center; }
+    code { background: #f4f4f4; padding: 2px 5px; border-radius: 4px; }
+    pre { background: #f8f8f8; padding: 14px; border-radius: 8px; overflow-x: auto; }
+    blockquote { border-left: 4px solid #c96a2b; margin: 16px 0; padding: 8px 16px; background: #fff7ea; }
+    hr { border: none; border-top: 1px solid #ddd; margin: 28px 0; }
+    ul, ol { margin-left: 24px; }
+  </style>
+</head>
+<body>
+<h1>Farmer-Buyer Marketplace System</h1>
+
+<h2>Detailed Project Report</h2>
+
+<h3>1. Introduction</h3>
+
+<p>This project, **Farmer-Buyer Marketplace System**, was developed as an undergraduate Java project to demonstrate both **core Java programming** and **Object-Oriented Programming concepts** in a practical and meaningful way.</p>
+
+<p>The main idea behind the project is simple and socially relevant: farmers often have crops available for sale, while buyers are looking for crops within a certain budget and location. This system acts like a digital bridge between the two. It stores farmer and buyer information, compares their needs and offerings, and recommends the best matches based on:</p>
+
+<ul>
+<li>crop availability</li>
+<li>budget compatibility</li>
+<li>same-city proximity</li>
+<li>quantity closeness</li>
+</ul>
+
+<p>The project was intentionally designed to be **academic, understandable, and presentable**. Instead of making it overly complicated, the system focuses on clearly demonstrating syllabus topics through a realistic application.</p>
+
+<p>This project now supports:</p>
+
+<ul>
+<li>a **Java Swing desktop application**</li>
+<li>a **browser-based web version**</li>
+<li>**CSV file storage**</li>
+<li>**serialized backup**</li>
+<li>**UML documentation**</li>
+</ul>
+
+<p>So it is both technically complete and strong from a report/viva point of view.</p>
+
+<hr>
+
+<h3>2. Problem Statement</h3>
+
+<p>Farmers and buyers usually depend on middlemen, manual communication, or scattered marketplaces. Because of this, it can be difficult for:</p>
+
+<ul>
+<li>farmers to find the right buyers</li>
+<li>buyers to locate suitable sellers quickly</li>
+<li>both parties to compare crop type, budget, and location efficiently</li>
+</ul>
+
+<p>This project solves that problem by creating a small marketplace system that:</p>
+
+<ol>
+<li>stores farmer details</li>
+<li>stores buyer requirements</li>
+<li>compares both sets of data</li>
+<li>generates suitable recommendations</li>
+<li>saves and loads data from files</li>
+</ol>
+
+<hr>
+
+<h3>3. Objectives of the Project</h3>
+
+<p>The main objectives of this project are:</p>
+
+<ul>
+<li>to build a meaningful Java application based on a real-world idea</li>
+<li>to cover the full undergraduate Java syllabus in one project</li>
+<li>to show clear use of OOP concepts like inheritance, abstraction, interfaces, and polymorphism</li>
+<li>to demonstrate file handling, exception handling, and data persistence</li>
+<li>to provide an easy-to-use interface for demonstration and evaluation</li>
+</ul>
+
+<hr>
+
+<h3>4. Scope of the Project</h3>
+
+<p>The current system supports:</p>
+
+<ul>
+<li>adding farmer records</li>
+<li>adding buyer records</li>
+<li>viewing all saved records</li>
+<li>searching by crop and city</li>
+<li>generating matches for one buyer or all buyers</li>
+<li>saving data to CSV files</li>
+<li>loading data from CSV files</li>
+<li>exporting match reports</li>
+<li>creating and restoring serialized backups</li>
+</ul>
+
+<p>The project does **not** currently include:</p>
+
+<ul>
+<li>online payments</li>
+<li>user login and authentication</li>
+<li>database integration</li>
+<li>real GPS distance calculation</li>
+<li>advanced analytics</li>
+</ul>
+
+<p>These were kept outside scope so that the project remains suitable for undergraduate academic evaluation.</p>
+
+<hr>
+
+<h3>5. Technologies Used</h3>
+
+<ul>
+<li>**Java**</li>
+<li>main programming language</li>
+<li>**Java Swing**</li>
+<li>desktop GUI</li>
+<li>**Java HTTP Server**</li>
+<li>lightweight built-in web server for browser access</li>
+<li>**CSV Files**</li>
+<li>text-based persistent storage</li>
+<li>**Object Streams**</li>
+<li>serialized backup storage</li>
+<li>**PlantUML**</li>
+<li>UML diagram source files</li>
+<li>**PowerShell**</li>
+<li>project run script</li>
+</ul>
+
+<hr>
+
+<h3>6. Project Workflow</h3>
+
+<p>This section explains the workflow in human terms.</p>
+
+<h4>6.1 Farmer workflow</h4>
+
+<ol>
+<li>A user opens the Farmer section.</li>
+<li>The user enters:</li>
+</ol>
+<ul>
+<li>farmer ID</li>
+<li>name</li>
+<li>city</li>
+<li>phone</li>
+<li>crop type</li>
+<li>quantity available</li>
+<li>price per unit</li>
+</ul>
+<ol>
+<li>The UI creates a `Farmer` object.</li>
+<li>The object is validated through constructors and setters.</li>
+<li>The manager checks whether the ID is unique.</li>
+<li>If valid, the farmer is added to the system.</li>
+<li>The table refreshes and shows the new farmer.</li>
+</ol>
+
+<h4>6.2 Buyer workflow</h4>
+
+<ol>
+<li>A user opens the Buyer section.</li>
+<li>The user enters:</li>
+</ol>
+<ul>
+<li>buyer ID</li>
+<li>name</li>
+<li>city</li>
+<li>phone</li>
+<li>required crop</li>
+<li>required quantity</li>
+<li>maximum budget</li>
+</ul>
+<ol>
+<li>The UI creates a `Buyer` object.</li>
+<li>Validation is performed.</li>
+<li>Duplicate ID checks are performed.</li>
+<li>If successful, the buyer is stored and displayed.</li>
+</ol>
+
+<h4>6.3 Matching workflow</h4>
+
+<ol>
+<li>The user chooses a buyer or selects the option to generate all matches.</li>
+<li>The system loops through farmers.</li>
+<li>For each farmer, the system checks:</li>
+</ol>
+<ul>
+<li>is the crop the same?</li>
+<li>is the city the same?</li>
+<li>is the price within the buyer&#x27;s budget?</li>
+<li>is quantity available greater than zero?</li>
+</ul>
+<ol>
+<li>If compatible, the system calculates a match score.</li>
+<li>A `MatchRecord` object is created.</li>
+<li>All compatible matches are sorted by score.</li>
+<li>The best matches are shown in the table and report area.</li>
+</ol>
+
+<h4>6.4 File workflow</h4>
+
+<ol>
+<li>When the user clicks save, farmer data, buyer data, and match data are written to CSV files.</li>
+<li>When the user clicks load, the system reads those files line by line.</li>
+<li>CSV values are converted back into `Farmer` and `Buyer` objects.</li>
+<li>If there is any invalid data, a custom exception is raised.</li>
+<li>Backup and restore use object streams to serialize and deserialize the full state.</li>
+</ol>
+
+<hr>
+
+<h3>7. Package Structure</h3>
+
+<p>The project is organized into packages so that each responsibility stays clear.</p>
+
+<h4>7.1 `farmmarket.app`</h4>
+
+<p>Contains the main starting point of the application.</p>
+
+<ul>
+<li>`FarmerBuyerMarketplaceApp`</li>
+</ul>
+
+<h4>7.2 `farmmarket.model`</h4>
+
+<p>Contains all domain classes and data objects.</p>
+
+<ul>
+<li>`User`</li>
+<li>`Farmer`</li>
+<li>`Buyer`</li>
+<li>`MatchRecord`</li>
+<li>`MarketplaceBackup`</li>
+</ul>
+
+<h4>7.3 `farmmarket.interfaces`</h4>
+
+<p>Contains behavior contracts.</p>
+
+<ul>
+<li>`Persistable`</li>
+<li>`Matchable`</li>
+</ul>
+
+<h4>7.4 `farmmarket.service`</h4>
+
+<p>Contains the business logic and file management.</p>
+
+<ul>
+<li>`MarketplaceManager`</li>
+<li>`FileManager`</li>
+</ul>
+
+<h4>7.5 `farmmarket.util`</h4>
+
+<p>Contains supporting utility code.</p>
+
+<ul>
+<li>`AppConstants`</li>
+<li>`ValidationUtil`</li>
+<li>`ReportGenerator`</li>
+</ul>
+
+<h4>7.6 `farmmarket.exceptions`</h4>
+
+<p>Contains custom exception classes.</p>
+
+<ul>
+<li>`InvalidDataException`</li>
+<li>`DuplicateIdException`</li>
+<li>`NoMatchFoundException`</li>
+</ul>
+
+<h4>7.7 `farmmarket.ui`</h4>
+
+<p>Contains the desktop user interface.</p>
+
+<ul>
+<li>`MainFrame`</li>
+<li>`FarmerPanel`</li>
+<li>`BuyerPanel`</li>
+<li>`MatchPanel`</li>
+<li>`ReportsPanel`</li>
+</ul>
+
+<h4>7.8 `farmmarket.web`</h4>
+
+<p>Contains the web server and API code.</p>
+
+<ul>
+<li>`MarketplaceWebServer`</li>
+<li>`ApiHandler`</li>
+<li>`StaticFileHandler`</li>
+<li>`HttpUtil`</li>
+</ul>
+
+<hr>
+
+<h3>8. Class-by-Class Explanation</h3>
+
+<p>This section is the heart of the report. It explains what each class contains and why it exists.</p>
+
+<h4>8.1 `User`</h4>
+
+<p>File: [User.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/model/User.java)</p>
+
+<p>This is the **abstract parent class** for all people in the system.</p>
+
+<p>It contains private fields:</p>
+
+<ul>
+<li>`id`</li>
+<li>`name`</li>
+<li>`city`</li>
+<li>`phone`</li>
+</ul>
+
+<p>It also provides:</p>
+
+<ul>
+<li>getters and setters</li>
+<li>built-in validation through setter methods</li>
+<li>abstract methods:</li>
+<li>`getRole()`</li>
+<li>`displayDetails()`</li>
+<li>`toTableRow()`</li>
+</ul>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>avoids duplication</li>
+<li>demonstrates abstraction</li>
+<li>demonstrates inheritance</li>
+<li>demonstrates encapsulation</li>
+</ul>
+
+<p>In simple words, `User` defines the common identity of a person in the system, while leaving specific behavior to subclasses.</p>
+
+<h4>8.2 `Farmer`</h4>
+
+<p>File: [Farmer.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/model/Farmer.java)</p>
+
+<p>This class extends `User` and implements `Matchable`.</p>
+
+<p>Additional fields:</p>
+
+<ul>
+<li>`cropType`</li>
+<li>`quantityAvailable`</li>
+<li>`pricePerUnit`</li>
+</ul>
+
+<p>Important methods:</p>
+
+<ul>
+<li>overloaded constructors</li>
+<li>`isCompatibleWith(Buyer buyer)`</li>
+<li>`calculateMatchScore(Buyer buyer)`</li>
+<li>overridden `displayDetails()`</li>
+<li>overridden `toString()`</li>
+<li>overridden `toCsv()`</li>
+<li>overridden `toTableRow()`</li>
+</ul>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>represents a real seller in the marketplace</li>
+<li>contains the logic for compatibility and scoring</li>
+<li>demonstrates inheritance, interface implementation, and overriding</li>
+</ul>
+
+<p>This is one of the most important classes because it combines data and behavior in a clean OOP style.</p>
+
+<h4>8.3 `Buyer`</h4>
+
+<p>File: [Buyer.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/model/Buyer.java)</p>
+
+<p>This class also extends `User`.</p>
+
+<p>Additional fields:</p>
+
+<ul>
+<li>`requiredCrop`</li>
+<li>`requiredQuantity`</li>
+<li>`maxBudget`</li>
+</ul>
+
+<p>Important methods:</p>
+
+<ul>
+<li>overloaded constructors</li>
+<li>overridden `displayDetails()`</li>
+<li>overridden `toString()`</li>
+<li>overridden `toCsv()`</li>
+<li>overridden `toTableRow()`</li>
+</ul>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>represents demand in the marketplace</li>
+<li>stores the exact crop and budget requirements needed for matching</li>
+</ul>
+
+<p>Together, `Farmer` and `Buyer` show how a parent class can be specialized in two different ways.</p>
+
+<h4>8.4 `MatchRecord`</h4>
+
+<p>File: [MatchRecord.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/model/MatchRecord.java)</p>
+
+<p>This class stores the result of a successful farmer-buyer comparison.</p>
+
+<p>Fields include:</p>
+
+<ul>
+<li>buyer ID and buyer name</li>
+<li>farmer ID and farmer name</li>
+<li>crop type</li>
+<li>city</li>
+<li>available quantity</li>
+<li>price per unit</li>
+<li>score</li>
+<li>status</li>
+</ul>
+
+<p>Important features:</p>
+
+<ul>
+<li>implements `Persistable`</li>
+<li>implements `Comparable&lt;MatchRecord&gt;`</li>
+<li>contains `toTableRow()`</li>
+<li>contains `toCsv()`</li>
+<li>defines `compareTo()` for score-based sorting</li>
+</ul>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>separates match result data from raw farmer and buyer data</li>
+<li>allows sorting of matches in descending score order</li>
+<li>supports reporting and CSV export</li>
+</ul>
+
+<h4>8.5 `MarketplaceBackup`</h4>
+
+<p>File: [MarketplaceBackup.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/model/MarketplaceBackup.java)</p>
+
+<p>This class stores:</p>
+
+<ul>
+<li>all farmers</li>
+<li>all buyers</li>
+<li>all last-generated matches</li>
+</ul>
+
+<p>It implements `Serializable`.</p>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>allows backup using object streams</li>
+<li>demonstrates object-level persistence</li>
+<li>keeps backup logic clean and separate from the manager</li>
+</ul>
+
+<h4>8.6 `Persistable`</h4>
+
+<p>File: [Persistable.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/interfaces/Persistable.java)</p>
+
+<p>This interface contains one method:</p>
+
+<ul>
+<li>`toCsv()`</li>
+</ul>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>ensures objects that can be saved know how to convert themselves into CSV format</li>
+<li>demonstrates interface-based design</li>
+</ul>
+
+<h4>8.7 `Matchable`</h4>
+
+<p>File: [Matchable.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/interfaces/Matchable.java)</p>
+
+<p>This interface contains:</p>
+
+<ul>
+<li>`isCompatibleWith(Buyer buyer)`</li>
+<li>`calculateMatchScore(Buyer buyer)`</li>
+</ul>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>defines the behavior required for any class that can participate in matching</li>
+<li>is implemented by `Farmer`</li>
+</ul>
+
+<p>This is a nice example of behavior abstraction.</p>
+
+<h4>8.8 `MarketplaceManager`</h4>
+
+<p>File: [MarketplaceManager.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/service/MarketplaceManager.java)</p>
+
+<p>This is the **central business logic class**.</p>
+
+<p>It stores:</p>
+
+<ul>
+<li>list of farmers</li>
+<li>list of buyers</li>
+<li>list of last generated matches</li>
+</ul>
+
+<p>It performs:</p>
+
+<ul>
+<li>adding farmers</li>
+<li>adding buyers</li>
+<li>searching farmers</li>
+<li>searching buyers</li>
+<li>generating matches</li>
+<li>generating all matches</li>
+<li>loading and saving through `FileManager`</li>
+<li>exporting and importing backup</li>
+<li>generating reports</li>
+<li>duplicate ID checking</li>
+</ul>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>it keeps business logic away from the UI</li>
+<li>it acts like the brain of the application</li>
+<li>it demonstrates loops, conditions, collections, exceptions, and overloading</li>
+</ul>
+
+<p>If someone asks for the most important class in the project, `MarketplaceManager` is a very strong answer.</p>
+
+<h4>8.9 `FileManager`</h4>
+
+<p>File: [FileManager.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/service/FileManager.java)</p>
+
+<p>This class handles persistence.</p>
+
+<p>Responsibilities:</p>
+
+<ul>
+<li>save farmers to CSV</li>
+<li>save buyers to CSV</li>
+<li>save matches to CSV</li>
+<li>load farmers from CSV</li>
+<li>load buyers from CSV</li>
+<li>export serialized backup</li>
+<li>import serialized backup</li>
+<li>create data folder if it does not exist</li>
+</ul>
+
+<p>Key technical points:</p>
+
+<ul>
+<li>uses `BufferedWriter` and `FileWriter`</li>
+<li>uses `BufferedReader` and `FileReader`</li>
+<li>uses `ObjectOutputStream` and `ObjectInputStream`</li>
+<li>uses `try-with-resources`</li>
+<li>throws custom exceptions for invalid records</li>
+</ul>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>demonstrates file handling in a clean and practical way</li>
+<li>separates persistence from UI and business logic</li>
+</ul>
+
+<h4>8.10 `AppConstants`</h4>
+
+<p>File: [AppConstants.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/util/AppConstants.java)</p>
+
+<p>Contains:</p>
+
+<ul>
+<li>crop array</li>
+<li>file names</li>
+<li>data directory constants</li>
+</ul>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>demonstrates arrays</li>
+<li>avoids hardcoding repeated values</li>
+</ul>
+
+<h4>8.11 `ValidationUtil`</h4>
+
+<p>File: [ValidationUtil.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/util/ValidationUtil.java)</p>
+
+<p>Contains reusable validation methods such as:</p>
+
+<ul>
+<li>`requireNonEmpty`</li>
+<li>`requireNonNegativeDouble`</li>
+<li>`requireNonNegativeInt`</li>
+<li>`requirePositiveInt`</li>
+<li>`normalizeText`</li>
+<li>`matchesIgnoreCase`</li>
+</ul>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>keeps validation logic reusable and centralized</li>
+<li>improves code readability</li>
+<li>demonstrates custom exception usage</li>
+</ul>
+
+<h4>8.12 `ReportGenerator`</h4>
+
+<p>File: [ReportGenerator.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/util/ReportGenerator.java)</p>
+
+<p>Generates:</p>
+
+<ul>
+<li>summary report</li>
+<li>match report</li>
+</ul>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>keeps reporting logic separate from the UI</li>
+<li>shows string building and formatted text generation</li>
+</ul>
+
+<h4>8.13 Exception Classes</h4>
+
+<p>Files:</p>
+
+<ul>
+<li>[InvalidDataException.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/exceptions/InvalidDataException.java)</li>
+<li>[DuplicateIdException.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/exceptions/DuplicateIdException.java)</li>
+<li>[NoMatchFoundException.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/exceptions/NoMatchFoundException.java)</li>
+</ul>
+
+<p>These classes are simple but important.</p>
+
+<p>They help the program communicate specific problems:</p>
+
+<ul>
+<li>invalid data entered by user or file</li>
+<li>duplicate IDs</li>
+<li>no compatible matches found</li>
+</ul>
+
+<p>Why it matters:</p>
+
+<ul>
+<li>makes error handling more professional and readable</li>
+<li>shows custom exception creation</li>
+</ul>
+
+<h4>8.14 Swing UI Classes</h4>
+
+<p>##### `MainFrame`</p>
+
+<p>File: [MainFrame.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/ui/MainFrame.java)</p>
+
+<p>Acts as the main window.</p>
+
+<p>It creates:</p>
+
+<ul>
+<li>`MarketplaceManager`</li>
+<li>`FileManager`</li>
+<li>`FarmerPanel`</li>
+<li>`BuyerPanel`</li>
+<li>`MatchPanel`</li>
+<li>`ReportsPanel`</li>
+</ul>
+
+<p>It also:</p>
+
+<ul>
+<li>loads initial data</li>
+<li>refreshes all tabs</li>
+<li>shows status messages</li>
+</ul>
+
+<p>##### `FarmerPanel`</p>
+
+<p>File: [FarmerPanel.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/ui/FarmerPanel.java)</p>
+
+<p>Contains:</p>
+
+<ul>
+<li>input form for farmer data</li>
+<li>add/reset buttons</li>
+<li>search controls</li>
+<li>table display using `Vector` and `DefaultTableModel`</li>
+<li>validation and error dialogs</li>
+</ul>
+
+<p>##### `BuyerPanel`</p>
+
+<p>File: [BuyerPanel.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/ui/BuyerPanel.java)</p>
+
+<p>Contains:</p>
+
+<ul>
+<li>input form for buyer data</li>
+<li>add/reset buttons</li>
+<li>search controls</li>
+<li>buyer table</li>
+<li>exception-based validation</li>
+</ul>
+
+<p>##### `MatchPanel`</p>
+
+<p>File: [MatchPanel.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/ui/MatchPanel.java)</p>
+
+<p>Contains:</p>
+
+<ul>
+<li>buyer selection combo box</li>
+<li>match selected buyer button</li>
+<li>generate all matches button</li>
+<li>export matches button</li>
+<li>match table</li>
+<li>report text area</li>
+</ul>
+
+<p>This panel is especially useful during demonstration because it clearly shows the matching logic at work.</p>
+
+<p>##### `ReportsPanel`</p>
+
+<p>File: [ReportsPanel.java](C:/Users/KrutarthPC/Desktop/OOP%20Project/src/farmmarket/ui/ReportsPanel.java)</p>
+
+<p>Contains:</p>
+
+<ul>
+<li>save button</li>
+<li>load button</li>
+<li>backup button</li>
+<li>restore button</li>
+<li>summary report area</li>
+</ul>
+
+<p>This class is important for showing file handling and object stream backup features.</p>
+
+<h4>8.15 Web Classes</h4>
+
+<p>The project also contains a web version so it can be opened in browsers on laptops and phones.</p>
+
+<p>##### `MarketplaceWebServer`</p>
+
+<p>Starts the HTTP server and binds to `0.0.0.0`.</p>
+
+<p>##### `ApiHandler`</p>
+
+<p>Handles:</p>
+
+<ul>
+<li>farmer APIs</li>
+<li>buyer APIs</li>
+<li>match APIs</li>
+<li>summary API</li>
+<li>save/load API</li>
+</ul>
+
+<p>##### `StaticFileHandler`</p>
+
+<p>Serves HTML, CSS, and JavaScript files.</p>
+
+<p>##### `HttpUtil`</p>
+
+<p>Contains helper methods for:</p>
+
+<ul>
+<li>JSON response writing</li>
+<li>body reading</li>
+<li>query parsing</li>
+<li>basic JSON escaping</li>
+</ul>
+
+<p>These classes are not required for the original syllabus, but they add a very useful practical extension.</p>
+
+<hr>
+
+<h3>9. How the Matching Logic Works</h3>
+
+<p>The matching logic is kept simple so that it is easy to explain in class.</p>
+
+<p>The method `isCompatibleWith(Buyer buyer)` in `Farmer` checks:</p>
+
+<ol>
+<li>buyer must not be null</li>
+<li>crop type must match</li>
+<li>city must match</li>
+<li>price per unit must be less than or equal to buyer budget</li>
+<li>quantity available must be greater than zero</li>
+</ol>
+
+<p>If all of these are true, the buyer and farmer are considered compatible.</p>
+
+<p>Then `calculateMatchScore(Buyer buyer)` gives a score:</p>
+
+<ul>
+<li>base score starts at `80`</li>
+<li>quantity closeness contributes up to `20`</li>
+<li>final score is rounded to 2 decimal places</li>
+</ul>
+
+<p>This creates a ranked recommendation system without unnecessary complexity.</p>
+
+<hr>
+
+<h3>10. How Data Moves Through the System</h3>
+
+<p>The internal data flow of the project is:</p>
+
+<ol>
+<li>UI accepts input</li>
+<li>Input becomes an object</li>
+<li>Object is validated</li>
+<li>Manager stores object</li>
+<li>Matching methods compare objects</li>
+<li>Result becomes `MatchRecord`</li>
+<li>Table and report show the result</li>
+<li>File manager saves data</li>
+</ol>
+
+<p>This separation is important because it makes the code organized:</p>
+
+<ul>
+<li>UI handles presentation</li>
+<li>manager handles logic</li>
+<li>models hold data</li>
+<li>file manager handles storage</li>
+<li>utilities support the system</li>
+</ul>
+
+<hr>
+
+<h3>11. Syllabus Coverage Explanation</h3>
+
+<p>This project covers the Java syllabus in a very natural way.</p>
+
+<h4>11.1 Classes and Objects</h4>
+
+<p>Covered through all model, manager, and UI classes.</p>
+
+<p>Examples:</p>
+
+<ul>
+<li>`Farmer farmer = new Farmer(...)`</li>
+<li>`Buyer buyer = new Buyer(...)`</li>
+<li>`MatchRecord match = new MatchRecord(...)`</li>
+</ul>
+
+<h4>11.2 Arrays</h4>
+
+<p>Covered through `AppConstants.CROP_TYPES`.</p>
+
+<h4>11.3 Strings</h4>
+
+<p>Used in IDs, crop names, city names, reports, file parsing, and UI labels.</p>
+
+<h4>11.4 Vectors</h4>
+
+<p>Used in Swing tables for rows and columns.</p>
+
+<h4>11.5 Operators, Loops, and Decision Making</h4>
+
+<p>Used in:</p>
+
+<ul>
+<li>searching</li>
+<li>file reading</li>
+<li>matching</li>
+<li>validation</li>
+<li>scoring</li>
+</ul>
+
+<h4>11.6 Encapsulation</h4>
+
+<p>Private fields plus getters/setters in model classes.</p>
+
+<h4>11.7 Constructors</h4>
+
+<p>Default and overloaded constructors in `Farmer` and `Buyer`.</p>
+
+<h4>11.8 Inheritance</h4>
+
+<p>`Farmer` and `Buyer` inherit from `User`.</p>
+
+<h4>11.9 Polymorphism</h4>
+
+<p>Overloading:</p>
+
+<ul>
+<li>constructors</li>
+<li>search methods</li>
+</ul>
+
+<p>Overriding:</p>
+
+<ul>
+<li>`displayDetails()`</li>
+<li>`toString()`</li>
+<li>`toCsv()`</li>
+<li>`toTableRow()`</li>
+</ul>
+
+<h4>11.10 Abstraction</h4>
+
+<p>Abstract class `User`.</p>
+
+<h4>11.11 Interfaces</h4>
+
+<p>`Persistable` and `Matchable`.</p>
+
+<h4>11.12 UML Diagrams</h4>
+
+<p>Included in the `docs/uml` folder.</p>
+
+<h4>11.13 File Handling and IO Streams</h4>
+
+<p>CSV read/write plus serialized backup.</p>
+
+<h4>11.14 Exception Handling</h4>
+
+<p>`try-catch`, `try-with-resources`, and custom exceptions.</p>
+
+<hr>
+
+<h3>12. UML Support in the Project</h3>
+
+<p>The project includes the following UML diagrams:</p>
+
+<ul>
+<li>use case diagram</li>
+<li>class diagram</li>
+<li>sequence diagram</li>
+<li>activity diagram</li>
+</ul>
+
+<p>These help explain the project before even running the code.</p>
+
+<p>The class diagram is especially valuable because it shows:</p>
+
+<ul>
+<li>abstract class</li>
+<li>interfaces</li>
+<li>inheritance</li>
+<li>association between manager and model classes</li>
+<li>custom exceptions</li>
+</ul>
+
+<hr>
+
+<h3>13. User Interface Design</h3>
+
+<p>The project contains two interfaces:</p>
+
+<h4>13.1 Desktop interface</h4>
+
+<p>Built using Swing.</p>
+
+<p>Advantages:</p>
+
+<ul>
+<li>simple to demonstrate in lab</li>
+<li>directly covers Java desktop UI concepts</li>
+<li>visually separates farmer, buyer, matching, and reports</li>
+</ul>
+
+<h4>13.2 Web interface</h4>
+
+<p>Built using Java HTTP server with HTML, CSS, and JavaScript.</p>
+
+<p>Advantages:</p>
+
+<ul>
+<li>can be opened on laptops and phones</li>
+<li>easier to share by link</li>
+<li>improves practical usefulness</li>
+</ul>
+
+<hr>
+
+<h3>14. Test Scenarios Covered</h3>
+
+<p>The system supports testing of:</p>
+
+<ul>
+<li>valid farmer creation</li>
+<li>valid buyer creation</li>
+<li>invalid blank fields</li>
+<li>negative quantity or price</li>
+<li>duplicate IDs</li>
+<li>file save and load</li>
+<li>match generation with valid compatibility</li>
+<li>no-match situations</li>
+<li>backup creation and restoration</li>
+</ul>
+
+<p>This makes the project not only functional, but also easy to evaluate systematically.</p>
+
+<hr>
+
+<h3>15. Strengths of the Project</h3>
+
+<ul>
+<li>clearly covers syllabus topics</li>
+<li>easy to explain during viva</li>
+<li>realistic real-world problem</li>
+<li>good package structure</li>
+<li>meaningful use of OOP</li>
+<li>file handling is practical, not artificial</li>
+<li>includes both desktop and web versions</li>
+<li>contains UML and documentation</li>
+</ul>
+
+<hr>
+
+<h3>16. Limitations</h3>
+
+<p>No academic project is perfect, and it is helpful to state limitations honestly.</p>
+
+<p>Current limitations include:</p>
+
+<ul>
+<li>no database</li>
+<li>no login system</li>
+<li>no real distance calculation</li>
+<li>no order confirmation workflow</li>
+<li>no payment gateway</li>
+<li>no advanced analytics</li>
+</ul>
+
+<p>These limitations are acceptable because the purpose of the project is educational clarity, not commercial deployment.</p>
+
+<hr>
+
+<h3>17. Future Enhancements</h3>
+
+<p>In future, the project can be extended with:</p>
+
+<ul>
+<li>user login and registration</li>
+<li>district or pincode-based matching</li>
+<li>real map distance integration</li>
+<li>admin dashboard</li>
+<li>database connectivity using MySQL</li>
+<li>order booking and status tracking</li>
+<li>online negotiation system</li>
+<li>analytics and demand forecasting</li>
+</ul>
+
+<hr>
+
+<h3>18. Conclusion</h3>
+
+<p>The **Farmer-Buyer Marketplace System** is a complete and meaningful Java project that successfully connects classroom concepts with a practical application.</p>
+
+<p>Instead of showing Java topics in isolation, the project uses them in a natural workflow:</p>
+
+<ul>
+<li>classes represent real entities</li>
+<li>inheritance reduces duplication</li>
+<li>interfaces define reusable behavior</li>
+<li>custom exceptions improve reliability</li>
+<li>file handling preserves data</li>
+<li>GUI and web interface make the system interactive</li>
+</ul>
+
+<p>Most importantly, this project is not just technically valid, but also **humanly understandable**. A teacher, examiner, or classmate can follow the flow without difficulty. That makes it especially suitable for an undergraduate report, demonstration, and viva.</p>
+
+<hr>
+
+<h3>19. Short Viva-Friendly Summary</h3>
+
+<p>If the project needs to be explained in one paragraph:</p>
+
+<blockquote>This project is a Java-based Farmer-Buyer Marketplace System that stores farmers and buyers, compares crop type, price, and city, and recommends the best matches. It demonstrates classes, objects, arrays, strings, vectors, constructors, inheritance, polymorphism, abstraction, interfaces, file handling, custom exceptions, and UML diagrams. The project uses a clean package structure, supports both desktop and browser interfaces, and saves data using CSV files and serialized backup.</blockquote>
+</body></html>

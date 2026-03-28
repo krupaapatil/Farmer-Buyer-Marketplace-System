@@ -1,0 +1,14 @@
+@startuml
+start
+:Enter farmer or buyer details;
+:Validate inputs;
+if (Valid data?) then (Yes)
+  :Create object;
+  :Add to MarketplaceManager;
+  :Refresh table;
+  :Save data if user clicks Save All;
+else (No)
+  :Show validation error dialog;
+endif
+stop
+@enduml

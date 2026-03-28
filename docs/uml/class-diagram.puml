@@ -1,0 +1,85 @@
+@startuml
+
+interface Persistable {
+  +toCsv() : String
+}
+
+interface Matchable {
+  +isCompatibleWith(buyer : Buyer) : boolean
+  +calculateMatchScore(buyer : Buyer) : double
+}
+
+abstract class User {
+  -id : String
+  -name : String
+  -city : String
+  -phone : String
+  +getRole() : String
+  +displayDetails() : String
+  +toTableRow() : String[]
+}
+
+class Farmer {
+  -cropType : String
+  -quantityAvailable : int
+  -pricePerUnit : double
+}
+
+class Buyer {
+  -requiredCrop : String
+  -requiredQuantity : int
+  -maxBudget : double
+}
+
+class MatchRecord {
+  -buyerId : String
+  -farmerId : String
+  -score : double
+  -status : String
+}
+
+class MarketplaceManager {
+  -farmers : List<Farmer>
+  -buyers : List<Buyer>
+  -lastGeneratedMatches : List<MatchRecord>
+  +addFarmer(farmer : Farmer)
+  +addBuyer(buyer : Buyer)
+  +searchFarmers(crop : String, city : String) : List<Farmer>
+  +searchBuyers(crop : String, city : String) : List<Buyer>
+  +generateMatchesForBuyer(buyer : Buyer) : List<MatchRecord>
+}
+
+class FileManager {
+  +saveFarmers(farmers : List<Farmer>)
+  +saveBuyers(buyers : List<Buyer>)
+  +saveMatches(matches : List<MatchRecord>)
+  +loadFarmers() : List<Farmer>
+  +loadBuyers() : List<Buyer>
+}
+
+class ReportGenerator
+class ValidationUtil
+class InvalidDataException
+class DuplicateIdException
+class NoMatchFoundException
+
+User <|-- Farmer
+User <|-- Buyer
+Persistable <|.. User
+Persistable <|.. MatchRecord
+Matchable <|.. Farmer
+MarketplaceManager --> Farmer
+MarketplaceManager --> Buyer
+MarketplaceManager --> MatchRecord
+MarketplaceManager --> FileManager
+FileManager --> Farmer
+FileManager --> Buyer
+ReportGenerator ..> Farmer
+ReportGenerator ..> Buyer
+ReportGenerator ..> MatchRecord
+ValidationUtil ..> User
+InvalidDataException --|> Exception
+DuplicateIdException --|> Exception
+NoMatchFoundException --|> Exception
+
+@enduml
