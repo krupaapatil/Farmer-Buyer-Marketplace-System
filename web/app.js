@@ -1,4 +1,9 @@
-const CROP_TYPES = ["All", "Wheat", "Rice", "Cotton", "Sugarcane", "Maize", "Tomato", "Potato", "Onion"];
+const CROP_TYPES = ["Wheat", "Rice", "Cotton", "Sugarcane", "Maize", "Tomato", "Potato", "Onion"];
+const WEIGHT_UNITS = [
+  { value: "kg", label: "Kilograms (kg)", factor: 1 },
+  { value: "quintal", label: "Quintals (100 kg)", factor: 100 },
+  { value: "ton", label: "Metric Tons (1000 kg)", factor: 1000 }
+];
 
 const farmerForm = document.getElementById("farmerForm");
 const buyerForm = document.getElementById("buyerForm");
@@ -8,11 +13,19 @@ const buyerMatchSelect = document.getElementById("buyerMatchSelect");
 const reportArea = document.getElementById("reportArea");
 const toast = document.getElementById("toast");
 
-document.addEventListener("DOMContentLoaded", async () => {
+async function initializeApp() {
   fillCropSelects();
+  fillWeightSelects();
   bindEvents();
+  setEntryFormDefaults();
   await refreshAll();
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initializeApp);
+} else {
+  initializeApp();
+}
 
 function bindEvents() {
   farmerForm.addEventListener("submit", async (event) => {
@@ -37,11 +50,13 @@ function bindEvents() {
 
   document.getElementById("resetFarmerSearch").addEventListener("click", async () => {
     farmerSearchForm.reset();
+    farmerSearchForm.querySelector("select[name='crop']").value = "";
     await loadFarmers();
   });
 
   document.getElementById("resetBuyerSearch").addEventListener("click", async () => {
     buyerSearchForm.reset();
+    buyerSearchForm.querySelector("select[name='crop']").value = "";
     await loadBuyers();
   });
 
@@ -68,20 +83,66 @@ function bindEvents() {
 }
 
 function fillCropSelects() {
-  fillSelect(farmerForm.querySelector("select[name='cropType']"), CROP_TYPES.filter((crop) => crop !== "All"));
-  fillSelect(buyerForm.querySelector("select[name='requiredCrop']"), CROP_TYPES.filter((crop) => crop !== "All"));
-  fillSelect(farmerSearchForm.querySelector("select[name='crop']"), CROP_TYPES);
-  fillSelect(buyerSearchForm.querySelector("select[name='crop']"), CROP_TYPES);
+  fillSelect(farmerForm.querySelector("select[name='cropType']"), CROP_TYPES, {
+    placeholder: "Select crop type"
+  });
+  fillSelect(buyerForm.querySelector("select[name='requiredCrop']"), CROP_TYPES, {
+    placeholder: "Select crop type"
+  });
+  fillSelect(farmerSearchForm.querySelector("select[name='crop']"), [
+    { value: "", label: "All crop types" },
+    ...CROP_TYPES.map((crop) => ({ value: crop, label: crop }))
+  ]);
+  fillSelect(buyerSearchForm.querySelector("select[name='crop']"), [
+    { value: "", label: "All crop types" },
+    ...CROP_TYPES.map((crop) => ({ value: crop, label: crop }))
+  ]);
 }
 
-function fillSelect(select, options) {
+function fillWeightSelects() {
+  const weightOptions = WEIGHT_UNITS.map((unit) => ({
+    value: unit.value,
+    label: unit.label
+  }));
+  fillSelect(farmerForm.querySelector("select[name='quantityAvailableUnit']"), weightOptions);
+  fillSelect(buyerForm.querySelector("select[name='requiredQuantityUnit']"), weightOptions);
+}
+
+function fillSelect(select, options, config = {}) {
+  const { placeholder = "", selectedValue = "" } = config;
   select.innerHTML = "";
+  if (placeholder) {
+    const placeholderOption = document.createElement("option");
+    placeholderOption.value = "";
+    placeholderOption.textContent = placeholder;
+    placeholderOption.disabled = true;
+    placeholderOption.selected = true;
+    placeholderOption.defaultSelected = true;
+    select.appendChild(placeholderOption);
+  }
+
   options.forEach((option) => {
     const element = document.createElement("option");
-    element.value = option === "All" ? "" : option;
-    element.textContent = option;
+    if (typeof option === "string") {
+      element.value = option;
+      element.textContent = option;
+    } else {
+      element.value = option.value;
+      element.textContent = option.label;
+    }
     select.appendChild(element);
   });
+
+  if (selectedValue) {
+    select.value = selectedValue;
+  }
+}
+
+function setEntryFormDefaults() {
+  farmerForm.querySelector("select[name='cropType']").value = "";
+  farmerForm.querySelector("select[name='quantityAvailableUnit']").value = "kg";
+  buyerForm.querySelector("select[name='requiredCrop']").value = "";
+  buyerForm.querySelector("select[name='requiredQuantityUnit']").value = "kg";
 }
 
 async function refreshAll() {
@@ -90,10 +151,15 @@ async function refreshAll() {
 }
 
 async function submitForm(url, form) {
+  const payload = buildFormPayload(form);
+  if (!payload) {
+    return;
+  }
+
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-    body: new URLSearchParams(new FormData(form))
+    body: payload
   });
   const data = await response.json();
   if (!response.ok) {
@@ -101,8 +167,64 @@ async function submitForm(url, form) {
     return;
   }
   form.reset();
+  setEntryFormDefaults();
   showToast(data.message || "Saved.");
   await refreshAll();
+}
+
+function buildFormPayload(form) {
+  const formData = new FormData(form);
+  const payload = new URLSearchParams();
+
+  formData.forEach((value, key) => {
+    if (!key.endsWith("Display") && !key.endsWith("Unit")) {
+      payload.append(key, value);
+    }
+  });
+
+  if (form === farmerForm) {
+    const quantityInKg = normalizeQuantity(
+      formData.get("quantityAvailableDisplay"),
+      formData.get("quantityAvailableUnit")
+    );
+    if (quantityInKg === null) {
+      return null;
+    }
+    payload.set("quantityAvailable", String(quantityInKg));
+  }
+
+  if (form === buyerForm) {
+    const quantityInKg = normalizeQuantity(
+      formData.get("requiredQuantityDisplay"),
+      formData.get("requiredQuantityUnit")
+    );
+    if (quantityInKg === null) {
+      return null;
+    }
+    payload.set("requiredQuantity", String(quantityInKg));
+  }
+
+  return payload;
+}
+
+function normalizeQuantity(rawQuantity, unitValue) {
+  const quantity = Number(rawQuantity);
+  if (!Number.isFinite(quantity) || quantity < 0) {
+    showToast("Enter a valid quantity.");
+    return null;
+  }
+
+  const unit = WEIGHT_UNITS.find((entry) => entry.value === unitValue);
+  if (!unit) {
+    showToast("Select a weight unit.");
+    return null;
+  }
+
+  if (quantity === 0) {
+    return 0;
+  }
+
+  return Math.ceil(quantity * unit.factor);
 }
 
 async function postAction(url) {

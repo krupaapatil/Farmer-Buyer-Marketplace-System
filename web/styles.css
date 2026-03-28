@@ -33,29 +33,16 @@ body {
   margin: 0 auto;
 }
 
-.eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  font-size: 0.78rem;
-  margin-bottom: 10px;
-  color: #f7c98a;
-}
-
 h1 {
   margin: 0;
   font-size: clamp(2rem, 4vw, 3.8rem);
-}
-
-.hero__text {
-  max-width: 740px;
-  line-height: 1.7;
 }
 
 .hero__stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 16px;
-  margin-top: 24px;
+  margin-top: 28px;
 }
 
 .stat-card,
@@ -107,11 +94,10 @@ h2 {
   margin: 0 0 14px;
 }
 
-.form-grid,
-.inline-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
 }
 
 input,
@@ -124,9 +110,57 @@ textarea {
   font: inherit;
 }
 
-.form-grid input,
-.form-grid select {
-  flex: 1 1 220px;
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.field span {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.field--span-2 {
+  grid-column: span 2;
+}
+
+.field--action {
+  align-items: flex-end;
+}
+
+.field--action button {
+  min-width: 180px;
+}
+
+.field--compact {
+  min-width: 160px;
+}
+
+.field--compact span {
+  font-size: 0.85rem;
+}
+
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.inline-form .field {
+  flex: 1 1 180px;
+}
+
+.inline-form button {
+  flex: 0 0 auto;
+}
+
+.input-combo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  gap: 10px;
 }
 
 button {
@@ -192,5 +226,24 @@ textarea {
 
   .panel--wide {
     grid-column: auto;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field--span-2 {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .input-combo {
+    grid-template-columns: 1fr;
+  }
+
+  .field--action button,
+  .inline-form button {
+    width: 100%;
   }
 }

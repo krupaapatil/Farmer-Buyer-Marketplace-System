@@ -9,11 +9,7 @@
 <body>
   <header class="hero">
     <div class="hero__content">
-      <p class="eyebrow">Java OOP Marketplace Project</p>
       <h1>Farmer-Buyer Marketplace</h1>
-      <p class="hero__text">
-        A browser-based platform that matches farmers and buyers using crop type, budget compatibility, and city proximity.
-      </p>
       <div class="hero__stats">
         <div class="stat-card">
           <span id="farmerCount">0</span>
@@ -35,28 +31,80 @@
     <section class="panel">
       <h2>Add Farmer</h2>
       <form id="farmerForm" class="form-grid">
-        <input name="id" placeholder="Farmer ID" required>
-        <input name="name" placeholder="Name" required>
-        <input name="city" placeholder="City" required>
-        <input name="phone" placeholder="Phone" required>
-        <select name="cropType" required></select>
-        <input name="quantityAvailable" type="number" min="0" placeholder="Quantity Available" required>
-        <input name="pricePerUnit" type="number" min="0" step="0.01" placeholder="Price Per Unit" required>
-        <button type="submit" class="primary">Add Farmer</button>
+        <label class="field">
+          <span>Farmer ID</span>
+          <input name="id" placeholder="Farmer ID" required>
+        </label>
+        <label class="field">
+          <span>Name</span>
+          <input name="name" placeholder="Name" required>
+        </label>
+        <label class="field">
+          <span>City</span>
+          <input name="city" placeholder="City" required>
+        </label>
+        <label class="field">
+          <span>Phone</span>
+          <input name="phone" placeholder="Phone" required>
+        </label>
+        <label class="field">
+          <span>Crop Type</span>
+          <select name="cropType" required></select>
+        </label>
+        <label class="field">
+          <span>Quantity Available</span>
+          <div class="input-combo">
+            <input name="quantityAvailableDisplay" type="number" min="0" step="0.01" placeholder="Enter quantity" required>
+            <select name="quantityAvailableUnit" required></select>
+          </div>
+        </label>
+        <label class="field field--span-2">
+          <span>Price Per Kg</span>
+          <input name="pricePerUnit" type="number" min="0" step="0.01" placeholder="Price Per Kg" required>
+        </label>
+        <div class="field field--span-2 field--action">
+          <button type="submit" class="primary">Add Farmer</button>
+        </div>
       </form>
     </section>
 
     <section class="panel">
       <h2>Add Buyer</h2>
       <form id="buyerForm" class="form-grid">
-        <input name="id" placeholder="Buyer ID" required>
-        <input name="name" placeholder="Name" required>
-        <input name="city" placeholder="City" required>
-        <input name="phone" placeholder="Phone" required>
-        <select name="requiredCrop" required></select>
-        <input name="requiredQuantity" type="number" min="0" placeholder="Required Quantity" required>
-        <input name="maxBudget" type="number" min="0" step="0.01" placeholder="Max Budget" required>
-        <button type="submit" class="primary">Add Buyer</button>
+        <label class="field">
+          <span>Buyer ID</span>
+          <input name="id" placeholder="Buyer ID" required>
+        </label>
+        <label class="field">
+          <span>Name</span>
+          <input name="name" placeholder="Name" required>
+        </label>
+        <label class="field">
+          <span>City</span>
+          <input name="city" placeholder="City" required>
+        </label>
+        <label class="field">
+          <span>Phone</span>
+          <input name="phone" placeholder="Phone" required>
+        </label>
+        <label class="field">
+          <span>Required Crop</span>
+          <select name="requiredCrop" required></select>
+        </label>
+        <label class="field">
+          <span>Required Quantity</span>
+          <div class="input-combo">
+            <input name="requiredQuantityDisplay" type="number" min="0" step="0.01" placeholder="Enter quantity" required>
+            <select name="requiredQuantityUnit" required></select>
+          </div>
+        </label>
+        <label class="field field--span-2">
+          <span>Max Budget Per Kg</span>
+          <input name="maxBudget" type="number" min="0" step="0.01" placeholder="Max Budget Per Kg" required>
+        </label>
+        <div class="field field--span-2 field--action">
+          <button type="submit" class="primary">Add Buyer</button>
+        </div>
       </form>
     </section>
 
@@ -64,8 +112,14 @@
       <div class="panel__header">
         <h2>Farmers</h2>
         <form id="farmerSearchForm" class="inline-form">
-          <select name="crop"></select>
-          <input name="city" placeholder="Search by city">
+          <label class="field field--compact">
+            <span>Crop</span>
+            <select name="crop"></select>
+          </label>
+          <label class="field field--compact">
+            <span>City</span>
+            <input name="city" placeholder="Search by city">
+          </label>
           <button type="submit">Search</button>
           <button type="button" id="resetFarmerSearch">Show All</button>
         </form>
@@ -79,8 +133,8 @@
               <th>City</th>
               <th>Phone</th>
               <th>Crop</th>
-              <th>Qty</th>
-              <th>Price</th>
+              <th>Qty (kg)</th>
+              <th>Price / kg</th>
             </tr>
           </thead>
           <tbody id="farmersTableBody"></tbody>
@@ -92,8 +146,14 @@
       <div class="panel__header">
         <h2>Buyers</h2>
         <form id="buyerSearchForm" class="inline-form">
-          <select name="crop"></select>
-          <input name="city" placeholder="Search by city">
+          <label class="field field--compact">
+            <span>Crop</span>
+            <select name="crop"></select>
+          </label>
+          <label class="field field--compact">
+            <span>City</span>
+            <input name="city" placeholder="Search by city">
+          </label>
           <button type="submit">Search</button>
           <button type="button" id="resetBuyerSearch">Show All</button>
         </form>
@@ -107,8 +167,8 @@
               <th>City</th>
               <th>Phone</th>
               <th>Crop</th>
-              <th>Qty</th>
-              <th>Budget</th>
+              <th>Qty (kg)</th>
+              <th>Budget / kg</th>
             </tr>
           </thead>
           <tbody id="buyersTableBody"></tbody>
@@ -133,8 +193,8 @@
               <th>Farmer</th>
               <th>Crop</th>
               <th>City</th>
-              <th>Qty</th>
-              <th>Price</th>
+              <th>Qty (kg)</th>
+              <th>Price / kg</th>
               <th>Score</th>
               <th>Status</th>
             </tr>
