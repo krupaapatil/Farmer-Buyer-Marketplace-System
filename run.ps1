@@ -32,6 +32,7 @@ $java = Get-JavaToolPath "java.exe"
 
 New-Item -ItemType Directory -Force -Path out | Out-Null
 $sourceFiles = Get-ChildItem -Recurse -Filter *.java | ForEach-Object { $_.FullName }
+$runtimeClasspath = "out;lib\*"
 
 Write-Host "Compiling project..."
 & $javac --add-modules jdk.httpserver -d out $sourceFiles
@@ -41,7 +42,7 @@ if ($LASTEXITCODE -ne 0) {
 
 if ($Mode -eq "desktop") {
     Write-Host "Launching Swing desktop app..."
-    & $java -cp out farmmarket.app.FarmerBuyerMarketplaceApp
+    & $java -cp $runtimeClasspath farmmarket.app.FarmerBuyerMarketplaceApp
     exit $LASTEXITCODE
 }
 
@@ -64,4 +65,4 @@ if ($OpenBrowser) {
     Start-Process $localUrl
 }
 
-& $java --add-modules jdk.httpserver -cp out farmmarket.web.MarketplaceWebServer $Port
+& $java --add-modules jdk.httpserver -cp $runtimeClasspath farmmarket.web.MarketplaceWebServer $Port

@@ -1,8 +1,16 @@
 package farmmarket.util;
 
+import java.util.Locale;
+import java.util.regex.Pattern;
+
 import farmmarket.exceptions.InvalidDataException;
 
 public final class ValidationUtil {
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern PHONE_PATTERN =
+            Pattern.compile("^[0-9+()\\-\\s]{7,20}$");
+
     private ValidationUtil() {
     }
 
@@ -40,5 +48,40 @@ public final class ValidationUtil {
 
     public static boolean matchesIgnoreCase(String left, String right) {
         return normalizeText(left).equals(normalizeText(right));
+    }
+
+    public static String requireEmail(String value, String fieldName) throws InvalidDataException {
+        String email = requireNonEmpty(value, fieldName).toLowerCase(Locale.ENGLISH);
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            throw new InvalidDataException(fieldName + " is not valid.");
+        }
+        return email;
+    }
+
+    public static String requirePhone(String value, String fieldName) throws InvalidDataException {
+        String phone = requireNonEmpty(value, fieldName);
+        if (!PHONE_PATTERN.matcher(phone).matches()) {
+            throw new InvalidDataException(fieldName + " is not valid.");
+        }
+        return phone;
+    }
+
+    public static String requireMinimumLength(String value, int minLength, String fieldName)
+            throws InvalidDataException {
+        String sanitizedValue = requireNonEmpty(value, fieldName);
+        if (sanitizedValue.length() < minLength) {
+            throw new InvalidDataException(fieldName + " must be at least " + minLength + " characters.");
+        }
+        return sanitizedValue;
+    }
+
+    public static String optionalText(String value, int maxLength) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+        String sanitizedValue = value.trim();
+        return sanitizedValue.length() > maxLength
+                ? sanitizedValue.substring(0, maxLength)
+                : sanitizedValue;
     }
 }
