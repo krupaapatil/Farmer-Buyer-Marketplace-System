@@ -27,6 +27,14 @@ public class StaticFileHandler implements HttpHandler {
         }
 
         Path requestedFile = webRoot.resolve(requestPath.substring(1)).normalize();
+        boolean missingAsset = !requestedFile.startsWith(webRoot)
+                || !Files.exists(requestedFile)
+                || Files.isDirectory(requestedFile);
+
+        if (missingAsset && !requestPath.contains(".")) {
+            requestedFile = webRoot.resolve("index.html").normalize();
+        }
+
         if (!requestedFile.startsWith(webRoot) || !Files.exists(requestedFile) || Files.isDirectory(requestedFile)) {
             HttpUtil.sendText(exchange, 404, "File not found.");
             return;

@@ -6,10 +6,8 @@ import java.util.concurrent.Executors;
 
 import com.sun.net.httpserver.HttpServer;
 
-import farmmarket.exceptions.DuplicateIdException;
-import farmmarket.exceptions.InvalidDataException;
 import farmmarket.service.FileManager;
-import farmmarket.service.MarketplaceManager;
+import farmmarket.service.MarketplaceDatabase;
 
 public final class MarketplaceWebServer {
     private MarketplaceWebServer() {
@@ -17,22 +15,22 @@ public final class MarketplaceWebServer {
 
     public static void main(String[] args) throws IOException {
         int port = resolvePort(args);
-        MarketplaceManager manager = new MarketplaceManager();
         FileManager fileManager = new FileManager();
+        MarketplaceDatabase database = new MarketplaceDatabase(fileManager);
 
         try {
-            manager.loadAll(fileManager);
-        } catch (InvalidDataException | DuplicateIdException e) {
-            System.err.println("Could not load startup data: " + e.getMessage());
+            database.initialize();
+        } catch (Exception e) {
+            throw new IOException("Could not initialize database: " + e.getMessage(), e);
         }
 
         HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", port), 0);
-        server.createContext("/api", new ApiHandler(manager, fileManager));
+        server.createContext("/api", new ApiHandler(database));
         server.createContext("/", new StaticFileHandler());
         server.setExecutor(Executors.newCachedThreadPool());
         server.start();
 
-        System.out.println("Farmer-Buyer web app running on http://0.0.0.0:" + port);
+        System.out.println("Farm marketplace web app running on http://0.0.0.0:" + port);
         System.out.println("Health check: http://0.0.0.0:" + port + "/api/health");
     }
 

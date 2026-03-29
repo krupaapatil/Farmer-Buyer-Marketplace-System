@@ -1,165 +1,68 @@
-# Farmer-Buyer Marketplace System
+# Harvest Hub Marketplace
 
-A Java OOP project with:
+Harvest Hub is a Java marketplace system for growers and buyers with:
 
-- a Swing desktop application
-- a browser-based web application
+- secure signup and login
+- unique user IDs
+- session-based authentication
+- an embedded SQLite database
+- a centralized dashboard
+- dedicated pages for adding crops, buying crops, and profile management
+- modern browser routing and a redesigned agriculture-inspired UI
 
-The system connects farmers with buyers using:
+## What Changed
 
-- crop availability
-- price compatibility
-- same-city proximity
-
-## Features
-
-- Add and view farmers
-- Add and view buyers
-- Search farmers and buyers by crop and city
-- Generate ranked matches for one buyer or all buyers
-- Save and load CSV data using file handling and IO streams
-- Export serialized backup using object streams
-- Display summary reports in the GUI and browser
-- Demonstrate exception handling with custom exceptions
-
-## OOP Topics Covered
-
-- Classes and objects
-- Arrays, strings, vectors
-- Operators, loops, decision making
-- Encapsulation
-- Constructors
-- Inheritance
-- Polymorphism through overloading and overriding
-- Abstraction
-- Interfaces
-- UML diagrams
-- File handling and IO streams
-- Exception handling and custom exceptions
+- Replaced the previous file-only web flow with a database-backed web application.
+- Added account creation, login, logout, and persistent sessions with HTTP-only cookies.
+- Added a dashboard that shows user profile details, recent activity, marketplace totals, and top matches.
+- Added ownership-aware crop listings and purchase requests, so each account can see its own history.
+- Preserved the original sample marketplace data by importing the CSV records into the database on first run.
 
 ## Project Structure
 
-- `src/farmmarket/app` - application entry point
-- `src/farmmarket/model` - domain classes
-- `src/farmmarket/interfaces` - interfaces
-- `src/farmmarket/service` - manager and file handling
-- `src/farmmarket/ui` - Swing GUI
-- `src/farmmarket/web` - Java web server
-- `src/farmmarket/util` - constants, validation, reporting
-- `web` - browser frontend files
-- `data` - sample CSV files
-- `docs/uml` - UML source diagrams
+- `src/farmmarket/service/MarketplaceDatabase.java` - SQLite-backed data and auth layer
+- `src/farmmarket/web/ApiHandler.java` - authenticated web API
+- `web/` - routed single-page frontend
+- `data/` - legacy CSV seed data and runtime database location
+- `lib/` - bundled JDBC and logging jars used by the web app
 
 ## How To Run
 
-### Easiest option
-
-Run the PowerShell launcher:
+### PowerShell launcher
 
 ```powershell
 .\run.ps1 -Mode web -OpenBrowser
 ```
 
-This starts the website version on `http://localhost:8080`.
-
-To start the desktop Swing version instead:
+### Manual compile
 
 ```powershell
-.\run.ps1 -Mode desktop
-```
-
-### Manual compile and run
-
-1. Install JDK 17 or later.
-2. Open a terminal in the project folder.
-3. Compile:
-
-```powershell
-javac --add-modules jdk.httpserver -d out (Get-ChildItem -Recurse -Filter *.java | ForEach-Object { $_.FullName })
-```
-
-4. Run the desktop app:
-
-```powershell
-java -cp out farmmarket.app.FarmerBuyerMarketplaceApp
-```
-
-5. Run the web app:
-
-```powershell
-java --add-modules jdk.httpserver -cp out farmmarket.web.MarketplaceWebServer 8080
+$javac = ".tools\jdk\jdk-17.0.18+8\bin\javac.exe"
+$java = ".tools\jdk\jdk-17.0.18+8\bin\java.exe"
+$sourceFiles = Get-ChildItem -Recurse -Filter *.java | ForEach-Object { $_.FullName }
+New-Item -ItemType Directory -Force -Path out | Out-Null
+& $javac --add-modules jdk.httpserver -d out $sourceFiles
+& $java --add-modules jdk.httpserver -cp "out;lib/*" farmmarket.web.MarketplaceWebServer 8080
 ```
 
 Then open `http://localhost:8080`.
 
-## Sample Files
+## Default Web Workflow
 
-- `data/farmers.csv`
-- `data/buyers.csv`
-- `data/matches.csv`
+1. Create an account from the signup page.
+2. Log in and land on the home dashboard.
+3. Use the quick navigation cards to open:
+   - Add Crops
+   - Buy Crops
+   - Profile
+4. Track your posted crops, purchase requests, and suggested matches from the dashboard.
 
-The app loads farmer and buyer data from the `data` folder at startup if the files exist.
+## Deployment Notes
 
-## Share As A Link
+- The Docker deployment now includes the `lib/` directory for SQLite support.
+- Runtime data is stored in `data/marketplace.db`.
+- The database file is ignored by Git, so each fresh deploy starts from the committed seed CSV data and then creates its own database.
 
-### Same Wi-Fi or local network
+## Legacy Desktop App
 
-Run:
-
-```powershell
-.\run.ps1 -Mode web
-```
-
-The script prints a network URL such as `http://192.168.1.5:8080`.
-Anyone on the same Wi-Fi can open that link from a phone or PC browser.
-
-### Public internet sharing
-
-This project includes a `Dockerfile` and `render.yaml`, so the simplest free deployment path is:
-
-- push the project to GitHub
-- create a free Render account
-- create a Render Blueprint from the repo
-- deploy and share the generated HTTPS link
-
-The Java web server already binds to `0.0.0.0` and supports a platform-provided `PORT`, which is required for public web deployment.
-
-For a full click-by-click guide, see `docs/deployment.md`.
-
-### Important note about saved data
-
-This project stores data in local CSV files inside the `data` folder.
-
-That is fine for:
-
-- demos
-- class submissions
-- portfolio links
-
-But on free cloud hosting, added data may reset after redeploys, restarts, or instance recycling. Treat the public deployment as a showcase version unless you later add a database.
-
-## Upload To GitHub Safely
-
-When creating your GitHub repo, upload these folders and files:
-
-- `src/`
-- `web/`
-- `data/`
-- `docs/`
-- `Dockerfile`
-- `render.yaml`
-- `README.md`
-- `.dockerignore`
-- `.gitignore`
-
-Do not upload build/runtime folders such as:
-
-- `.tools/`
-- `out/`
-- `*.log`
-
-## Notes
-
-- Matching is intentionally simple for classroom explanation.
-- The project uses file storage only, not a database.
-- No login, payment, or external database is included.
+The original Swing desktop classes are still present and compile, but the main web experience is now the upgraded authenticated dashboard application.

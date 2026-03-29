@@ -2,6 +2,7 @@ FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
+COPY lib ./lib
 COPY src ./src
 COPY web ./web
 COPY data ./data
@@ -11,4 +12,4 @@ RUN mkdir -p out \
 
 EXPOSE 10000
 
-CMD ["java", "--add-modules", "jdk.httpserver", "-cp", "out", "farmmarket.web.MarketplaceWebServer"]
+CMD ["java", "--add-modules", "jdk.httpserver", "-cp", "out:lib/*", "farmmarket.web.MarketplaceWebServer"]

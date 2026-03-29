@@ -2,5 +2,7 @@ out/
 .tools/
 *.log
 *.class
+data/*.db
+data/*.db-*
 Thumbs.db
 .DS_Store
