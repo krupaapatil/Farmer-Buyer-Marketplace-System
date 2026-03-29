@@ -8,6 +8,7 @@ const toast = document.getElementById("toast");
 const state = {
   user: null,
   route: "/",
+  profileMenuOpen: false,
   dashboard: null,
   profile: null,
   myCrops: [],
@@ -28,7 +29,17 @@ document.addEventListener("click", (event) => {
   const routeTarget = event.target.closest("[data-route]");
   if (routeTarget) {
     event.preventDefault();
+    state.profileMenuOpen = false;
     navigate(routeTarget.dataset.route);
+    return;
+  }
+
+  const profileToggle = event.target.closest("[data-profile-toggle]");
+  if (profileToggle) {
+    event.preventDefault();
+    state.profileMenuOpen = !state.profileMenuOpen;
+    renderApp();
+    bindForms();
     return;
   }
 
@@ -36,6 +47,13 @@ document.addEventListener("click", (event) => {
   if (logoutTarget) {
     event.preventDefault();
     handleLogout();
+    return;
+  }
+
+  if (state.profileMenuOpen && !event.target.closest(".profile-menu-container")) {
+    state.profileMenuOpen = false;
+    renderApp();
+    bindForms();
   }
 });
 
@@ -204,14 +222,7 @@ function renderAuthPage(mode) {
   return `
     <div class="auth-shell">
       <section class="auth-visual">
-        <div class="auth-visual__badge">Harvest Hub</div>
-        <h1>Professional crop trading, built for clarity.</h1>
-        <p>Secure sign-in, user-specific history, guided dashboards, and cleaner crop workflows for growers and buyers.</p>
-        <div class="auth-visual__points">
-          <div class="mini-card"><strong>Secure accounts</strong><span>Unique user IDs with session-based access.</span></div>
-          <div class="mini-card"><strong>Smarter dashboard</strong><span>See your activity, matches, and profile summary instantly.</span></div>
-          <div class="mini-card"><strong>Faster workflows</strong><span>Jump straight to add crops, buy crops, and profile pages.</span></div>
-        </div>
+        <div class="auth-visual__title">Harvest Hub</div>
       </section>
       <section class="auth-panel">
         <div class="auth-panel__header">
@@ -239,6 +250,7 @@ function renderAuthPage(mode) {
 }
 
 function renderShell({ title, subtitle, content }) {
+  const initial = escapeHtml((state.user.fullName || "U").trim().charAt(0).toUpperCase());
   return `
     <div class="app-shell">
       <aside class="sidebar">
@@ -250,16 +262,11 @@ function renderShell({ title, subtitle, content }) {
           </div>
         </div>
         <nav class="nav-links">
-          ${renderNavLink("/dashboard", "Dashboard")}
+          ${renderNavLink("/dashboard", "Home Dashboard")}
           ${renderNavLink("/add-crops", "Add Crops")}
           ${renderNavLink("/buy-crops", "Buy Crops")}
           ${renderNavLink("/profile", "Profile")}
         </nav>
-        <div class="profile-chip">
-          <strong>${escapeHtml(state.user.fullName)}</strong>
-          <span>${escapeHtml(state.user.userId)}</span>
-          <button class="button button--ghost button--full" data-logout="true">Log Out</button>
-        </div>
       </aside>
       <main class="content-area">
         <section class="page-hero">
@@ -268,9 +275,9 @@ function renderShell({ title, subtitle, content }) {
             <h1>${escapeHtml(title)}</h1>
             <p>${escapeHtml(subtitle)}</p>
           </div>
-          <div class="page-hero__meta">
-            <span>${escapeHtml(state.user.city)}</span>
-            <span>${escapeHtml(state.user.email)}</span>
+          <div class="page-hero__meta profile-menu-container">
+            <button class="profile-avatar" data-profile-toggle="true" aria-label="Open profile summary">${initial}</button>
+            ${state.profileMenuOpen ? renderProfileMenu() : ""}
           </div>
         </section>
         ${content}
@@ -283,37 +290,26 @@ function renderDashboard() {
   const dashboard = state.dashboard || { stats: {}, recentActivity: [], topMatches: [], user: state.user };
   const stats = dashboard.stats || {};
   return `
-    <section class="stats-grid">
+    <article class="panel">
+      <div class="panel__header"><h2>Top Matches</h2></div>
+      ${renderMatches(dashboard.topMatches || [])}
+    </article>
+    <article class="panel dashboard-section">
+      <div class="panel__header"><h2>Recent Activities</h2></div>
+      ${renderActivityList(dashboard.recentActivity || [])}
+    </article>
+    <section class="stats-grid dashboard-section">
       ${renderStatCard("Crops Posted", stats.cropPosts || 0, "Listings created by you")}
       ${renderStatCard("Purchase Requests", stats.purchaseRequests || 0, "Demand records in your account")}
       ${renderStatCard("Market Listings", stats.marketplaceCrops || 0, "All available crop offers")}
       ${renderStatCard("Open Buyer Demand", stats.marketplaceDemand || 0, "Active requests across the market")}
       ${renderStatCard("Ready Matches", stats.availableMatches || 0, "High-fit opportunities involving you")}
     </section>
-    <section class="quick-grid">
+    <section class="quick-grid dashboard-section">
       ${renderQuickCard("/add-crops", "Add crop inventory", "Create a new crop post and review buyer demand.")}
       ${renderQuickCard("/buy-crops", "Buy crops", "Post buying needs and browse current marketplace supply.")}
       ${renderQuickCard("/profile", "Profile settings", "Update your city, phone, and account details.")}
     </section>
-    <section class="panel-grid">
-      <article class="panel">
-        <div class="panel__header"><h2>Recent Activity</h2></div>
-        ${renderActivityList(dashboard.recentActivity || [])}
-      </article>
-      <article class="panel">
-        <div class="panel__header"><h2>Profile Summary</h2></div>
-        <div class="profile-summary">
-          <div><span>User ID</span><strong>${escapeHtml(dashboard.user.userId)}</strong></div>
-          <div><span>Name</span><strong>${escapeHtml(dashboard.user.fullName)}</strong></div>
-          <div><span>Email</span><strong>${escapeHtml(dashboard.user.email)}</strong></div>
-          <div><span>City</span><strong>${escapeHtml(dashboard.user.city)}</strong></div>
-        </div>
-      </article>
-    </section>
-    <article class="panel">
-      <div class="panel__header"><h2>Top Matches</h2></div>
-      ${renderMatches(dashboard.topMatches || [])}
-    </article>
   `;
 }
 
@@ -440,6 +436,26 @@ function renderActivityList(items) {
 function renderNavLink(route, label) {
   const active = state.route === route ? "nav-link nav-link--active" : "nav-link";
   return `<button class="${active}" data-route="${route}">${label}</button>`;
+}
+
+function renderProfileMenu() {
+  const profile = state.profile || state.dashboard?.user || state.user;
+  return `
+    <div class="profile-menu">
+      <div class="profile-menu__header">
+        <strong>${escapeHtml(profile.fullName)}</strong>
+        <span>${escapeHtml(profile.userId)}</span>
+      </div>
+      <div class="profile-summary profile-summary--compact">
+        <div><span>Email</span><strong>${escapeHtml(profile.email)}</strong></div>
+        <div><span>City</span><strong>${escapeHtml(profile.city)}</strong></div>
+      </div>
+      <div class="profile-menu__actions">
+        <button class="button" data-route="/profile">Open Profile</button>
+        <button class="button button--ghost" data-logout="true">Log Out</button>
+      </div>
+    </div>
+  `;
 }
 
 function renderQuickCard(route, title, description) {
