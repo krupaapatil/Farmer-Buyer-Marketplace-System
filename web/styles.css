@@ -329,7 +329,6 @@ textarea {
 }
 
 .page-hero__meta {
-  position: relative;
   display: flex;
   justify-content: flex-end;
   align-items: flex-start;
@@ -427,14 +426,6 @@ textarea {
   border: 1px solid var(--line);
 }
 
-.profile-summary--compact {
-  gap: 10px;
-}
-
-.profile-summary--compact div {
-  padding: 12px 14px;
-}
-
 .profile-avatar {
   width: 48px;
   height: 48px;
@@ -445,35 +436,6 @@ textarea {
   color: #f8f5ee;
   font-weight: 800;
   box-shadow: 0 12px 28px rgba(31, 75, 44, 0.22);
-}
-
-.profile-menu {
-  position: absolute;
-  top: calc(100% + 12px);
-  right: 0;
-  width: min(320px, 78vw);
-  padding: 16px;
-  border-radius: 20px;
-  border: 1px solid var(--line);
-  background: rgba(255, 252, 245, 0.98);
-  box-shadow: var(--shadow);
-  z-index: 30;
-}
-
-.profile-menu__header {
-  margin-bottom: 12px;
-}
-
-.profile-menu__header span {
-  display: block;
-  margin-top: 4px;
-  color: var(--muted);
-}
-
-.profile-menu__actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 14px;
 }
 
 .badge {
@@ -634,12 +596,4 @@ tbody tr:nth-child(even) {
     width: 100%;
   }
 
-  .profile-menu {
-    left: 0;
-    right: auto;
-  }
-
-  .profile-menu__actions {
-    flex-direction: column;
-  }
 }

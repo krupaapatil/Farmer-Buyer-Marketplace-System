@@ -8,7 +8,6 @@ const toast = document.getElementById("toast");
 const state = {
   user: null,
   route: "/",
-  profileMenuOpen: false,
   dashboard: null,
   profile: null,
   myCrops: [],
@@ -29,17 +28,7 @@ document.addEventListener("click", (event) => {
   const routeTarget = event.target.closest("[data-route]");
   if (routeTarget) {
     event.preventDefault();
-    state.profileMenuOpen = false;
     navigate(routeTarget.dataset.route);
-    return;
-  }
-
-  const profileToggle = event.target.closest("[data-profile-toggle]");
-  if (profileToggle) {
-    event.preventDefault();
-    state.profileMenuOpen = !state.profileMenuOpen;
-    renderApp();
-    bindForms();
     return;
   }
 
@@ -48,12 +37,6 @@ document.addEventListener("click", (event) => {
     event.preventDefault();
     handleLogout();
     return;
-  }
-
-  if (state.profileMenuOpen && !event.target.closest(".profile-menu-container")) {
-    state.profileMenuOpen = false;
-    renderApp();
-    bindForms();
   }
 });
 
@@ -275,9 +258,8 @@ function renderShell({ title, subtitle, content }) {
             <h1>${escapeHtml(title)}</h1>
             <p>${escapeHtml(subtitle)}</p>
           </div>
-          <div class="page-hero__meta profile-menu-container">
-            <button class="profile-avatar" data-profile-toggle="true" aria-label="Open profile summary">${initial}</button>
-            ${state.profileMenuOpen ? renderProfileMenu() : ""}
+          <div class="page-hero__meta">
+            <button class="profile-avatar" data-route="/profile" aria-label="Open profile page">${initial}</button>
           </div>
         </section>
         ${content}
@@ -308,7 +290,6 @@ function renderDashboard() {
     <section class="quick-grid dashboard-section">
       ${renderQuickCard("/add-crops", "Add crop inventory", "Create a new crop post and review buyer demand.")}
       ${renderQuickCard("/buy-crops", "Buy crops", "Post buying needs and browse current marketplace supply.")}
-      ${renderQuickCard("/profile", "Profile settings", "Update your city, phone, and account details.")}
     </section>
   `;
 }
@@ -390,6 +371,7 @@ function renderProfilePage() {
           <label class="field"><span>Email</span><input value="${escapeHtml(profile.email)}" disabled></label>
           <label class="field"><span>User ID</span><input value="${escapeHtml(profile.userId)}" disabled></label>
           <button type="submit" class="button button--primary">Save Changes</button>
+          <button type="button" class="button button--ghost" data-logout="true">Log Out</button>
         </form>
       </article>
       <article class="panel">
@@ -436,26 +418,6 @@ function renderActivityList(items) {
 function renderNavLink(route, label) {
   const active = state.route === route ? "nav-link nav-link--active" : "nav-link";
   return `<button class="${active}" data-route="${route}">${label}</button>`;
-}
-
-function renderProfileMenu() {
-  const profile = state.profile || state.dashboard?.user || state.user;
-  return `
-    <div class="profile-menu">
-      <div class="profile-menu__header">
-        <strong>${escapeHtml(profile.fullName)}</strong>
-        <span>${escapeHtml(profile.userId)}</span>
-      </div>
-      <div class="profile-summary profile-summary--compact">
-        <div><span>Email</span><strong>${escapeHtml(profile.email)}</strong></div>
-        <div><span>City</span><strong>${escapeHtml(profile.city)}</strong></div>
-      </div>
-      <div class="profile-menu__actions">
-        <button class="button" data-route="/profile">Open Profile</button>
-        <button class="button button--ghost" data-logout="true">Log Out</button>
-      </div>
-    </div>
-  `;
 }
 
 function renderQuickCard(route, title, description) {
