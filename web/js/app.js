@@ -13,6 +13,7 @@ import { isDesktopViewport } from "./utils.js";
 
 const appRoot = document.getElementById("app");
 const navModeStorageKey = "harvest-hub-nav-docked";
+let lastViewportWidth = window.innerWidth;
 
 const state = {
   user: null,
@@ -88,6 +89,16 @@ window.addEventListener("popstate", () => {
 });
 
 window.addEventListener("resize", () => {
+  const nextViewportWidth = window.innerWidth;
+  const widthChanged = nextViewportWidth !== lastViewportWidth;
+  lastViewportWidth = nextViewportWidth;
+
+  // Mobile keyboards often trigger a height-only resize. Re-rendering here
+  // replaces the focused input and immediately dismisses the keyboard.
+  if (!widthChanged) {
+    return;
+  }
+
   syncResponsiveLayout();
   render();
 });
@@ -248,6 +259,7 @@ if (document.readyState === "loading") {
 }
 
 async function initializeApp() {
+  lastViewportWidth = window.innerWidth;
   syncResponsiveLayout(true);
   render();
   await refreshSession();
