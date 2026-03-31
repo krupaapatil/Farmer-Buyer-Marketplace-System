@@ -59,10 +59,16 @@ public class MarketplaceDatabase {
 
     public AccountUser createUser(String fullName, String email, String city, String phone, String password)
             throws SQLException, InvalidDataException {
+        return createUser(fullName, email, city, phone, password, AppConstants.DEFAULT_USER_ROLE);
+    }
+
+    public AccountUser createUser(String fullName, String email, String city, String phone, String password,
+            String role) throws SQLException, InvalidDataException {
         String sanitizedName = ValidationUtil.requireNonEmpty(fullName, "Full name");
         String sanitizedEmail = ValidationUtil.requireEmail(email, "Email");
-        String sanitizedCity = ValidationUtil.requireNonEmpty(city, "City");
+        String sanitizedCity = ValidationUtil.requireNonEmpty(city, "Location");
         String sanitizedPhone = ValidationUtil.requirePhone(phone, "Phone");
+        String sanitizedRole = ValidationUtil.requireRole(role);
         SecurityUtil.PasswordHash passwordHash = SecurityUtil.hashPassword(password);
         String userId = generateUniqueId("USR", "users", "user_id");
         String timestamp = Instant.now().toString();
@@ -70,18 +76,20 @@ public class MarketplaceDatabase {
         try (Connection connection = openConnection();
                 PreparedStatement statement = connection.prepareStatement(
                         """
-                        INSERT INTO users (user_id, full_name, email, city, phone, password_hash, password_salt, created_at, updated_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        INSERT INTO users
+                        (user_id, full_name, email, city, phone, role, password_hash, password_salt, created_at, updated_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """)) {
             statement.setString(1, userId);
             statement.setString(2, sanitizedName);
             statement.setString(3, sanitizedEmail);
             statement.setString(4, sanitizedCity);
             statement.setString(5, sanitizedPhone);
-            statement.setString(6, passwordHash.hash());
-            statement.setString(7, passwordHash.salt());
-            statement.setString(8, timestamp);
+            statement.setString(6, sanitizedRole);
+            statement.setString(7, passwordHash.hash());
+            statement.setString(8, passwordHash.salt());
             statement.setString(9, timestamp);
+            statement.setString(10, timestamp);
             statement.executeUpdate();
         } catch (SQLException exception) {
             if (isUniqueConstraintViolation(exception)) {
@@ -100,7 +108,7 @@ public class MarketplaceDatabase {
         try (Connection connection = openConnection();
                 PreparedStatement statement = connection.prepareStatement(
                         """
-                        SELECT user_id, full_name, email, city, phone, password_hash, password_salt, created_at, updated_at
+                        SELECT user_id, full_name, email, city, phone, role, password_hash, password_salt, created_at, updated_at
                         FROM users
                         WHERE email = ?
                         """)) {
@@ -148,7 +156,8 @@ public class MarketplaceDatabase {
             cleanupExpiredSessions(connection);
             try (PreparedStatement statement = connection.prepareStatement(
                     """
-                    SELECT users.user_id, users.full_name, users.email, users.city, users.phone, users.created_at, users.updated_at
+                    SELECT users.user_id, users.full_name, users.email, users.city, users.phone, users.role,
+                           users.created_at, users.updated_at
                     FROM sessions
                     JOIN users ON users.user_id = sessions.user_id
                     WHERE sessions.session_id = ?
@@ -181,7 +190,7 @@ public class MarketplaceDatabase {
         try (Connection connection = openConnection();
                 PreparedStatement statement = connection.prepareStatement(
                         """
-                        SELECT user_id, full_name, email, city, phone, created_at, updated_at
+                        SELECT user_id, full_name, email, city, phone, role, created_at, updated_at
                         FROM users
                         WHERE user_id = ?
                         """)) {
@@ -197,23 +206,31 @@ public class MarketplaceDatabase {
 
     public AccountUser updateUser(String userId, String fullName, String city, String phone)
             throws SQLException, InvalidDataException {
+        AccountUser currentUser = requireUser(userId);
+        return updateUser(userId, fullName, city, phone, currentUser.getRole());
+    }
+
+    public AccountUser updateUser(String userId, String fullName, String city, String phone, String role)
+            throws SQLException, InvalidDataException {
         String sanitizedName = ValidationUtil.requireNonEmpty(fullName, "Full name");
-        String sanitizedCity = ValidationUtil.requireNonEmpty(city, "City");
+        String sanitizedCity = ValidationUtil.requireNonEmpty(city, "Location");
         String sanitizedPhone = ValidationUtil.requirePhone(phone, "Phone");
+        String sanitizedRole = ValidationUtil.requireRole(role);
         String timestamp = Instant.now().toString();
 
         try (Connection connection = openConnection();
                 PreparedStatement statement = connection.prepareStatement(
                         """
                         UPDATE users
-                        SET full_name = ?, city = ?, phone = ?, updated_at = ?
+                        SET full_name = ?, city = ?, phone = ?, role = ?, updated_at = ?
                         WHERE user_id = ?
                         """)) {
             statement.setString(1, sanitizedName);
             statement.setString(2, sanitizedCity);
             statement.setString(3, sanitizedPhone);
-            statement.setString(4, timestamp);
-            statement.setString(5, userId);
+            statement.setString(4, sanitizedRole);
+            statement.setString(5, timestamp);
+            statement.setString(6, userId);
             statement.executeUpdate();
         }
 
@@ -222,10 +239,22 @@ public class MarketplaceDatabase {
 
     public CropPost createCropPost(String userId, String cropType, int quantityKg, double pricePerKg, String notes)
             throws SQLException, InvalidDataException {
+        return createCropPost(userId, cropType, quantityKg, AppConstants.DEFAULT_UNIT, pricePerKg, null, notes,
+                AppConstants.DEFAULT_STATUS);
+    }
+
+    public CropPost createCropPost(String userId, String cropType, int quantityKg, String unit, double pricePerKg,
+            String location, String notes, String status) throws SQLException, InvalidDataException {
         AccountUser user = requireUser(userId);
-        String sanitizedCropType = ValidationUtil.requireNonEmpty(cropType, "Crop type");
+        requireRoleAccess(user, "buyer", "Buyer-only accounts cannot create crop listings.");
+        String sanitizedCropType = ValidationUtil.requireCropType(cropType);
         int sanitizedQuantity = ValidationUtil.requirePositiveInt(quantityKg, "Quantity");
-        double sanitizedPrice = ValidationUtil.requireNonNegativeDouble(pricePerKg, "Price per kg");
+        String sanitizedUnit = ValidationUtil.requireUnit(unit);
+        double sanitizedPrice = ValidationUtil.requirePositiveDouble(pricePerKg, "Expected price");
+        String sanitizedLocation = ValidationUtil.requireNonEmpty(
+                location == null || location.isBlank() ? user.getLocation() : location,
+                "Location");
+        String sanitizedStatus = ValidationUtil.requireStatus(status);
         String cropPostId = generateUniqueId("CRP", "crop_posts", "crop_post_id");
         String timestamp = Instant.now().toString();
 
@@ -233,19 +262,22 @@ public class MarketplaceDatabase {
                 PreparedStatement statement = connection.prepareStatement(
                         """
                         INSERT INTO crop_posts
-                        (crop_post_id, owner_user_id, seller_name, city, phone, crop_type, quantity_kg, price_per_kg, notes, created_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        (crop_post_id, owner_user_id, seller_name, city, phone, crop_type, quantity_kg, unit,
+                         price_per_kg, notes, status, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """)) {
             statement.setString(1, cropPostId);
             statement.setString(2, user.getUserId());
             statement.setString(3, user.getFullName());
-            statement.setString(4, user.getCity());
+            statement.setString(4, sanitizedLocation);
             statement.setString(5, user.getPhone());
             statement.setString(6, sanitizedCropType);
             statement.setInt(7, sanitizedQuantity);
-            statement.setDouble(8, sanitizedPrice);
-            statement.setString(9, ValidationUtil.optionalText(notes, 280));
-            statement.setString(10, timestamp);
+            statement.setString(8, sanitizedUnit);
+            statement.setDouble(9, sanitizedPrice);
+            statement.setString(10, ValidationUtil.optionalText(notes, 500));
+            statement.setString(11, sanitizedStatus);
+            statement.setString(12, timestamp);
             statement.executeUpdate();
         }
 
@@ -254,10 +286,23 @@ public class MarketplaceDatabase {
 
     public PurchaseRequest createPurchaseRequest(String userId, String cropType, int quantityKg, double maxBudget,
             String notes) throws SQLException, InvalidDataException {
+        return createPurchaseRequest(userId, cropType, quantityKg, AppConstants.DEFAULT_UNIT, maxBudget, null, notes,
+                AppConstants.DEFAULT_STATUS);
+    }
+
+    public PurchaseRequest createPurchaseRequest(String userId, String cropType, int quantityKg, String unit,
+            double maxBudget, String location, String notes, String status)
+            throws SQLException, InvalidDataException {
         AccountUser user = requireUser(userId);
-        String sanitizedCropType = ValidationUtil.requireNonEmpty(cropType, "Crop type");
+        requireRoleAccess(user, "farmer", "Farmer-only accounts cannot create purchase requests.");
+        String sanitizedCropType = ValidationUtil.requireCropType(cropType);
         int sanitizedQuantity = ValidationUtil.requirePositiveInt(quantityKg, "Required quantity");
-        double sanitizedBudget = ValidationUtil.requireNonNegativeDouble(maxBudget, "Budget per kg");
+        String sanitizedUnit = ValidationUtil.requireUnit(unit);
+        double sanitizedBudget = ValidationUtil.requirePositiveDouble(maxBudget, "Budget");
+        String sanitizedLocation = ValidationUtil.requireNonEmpty(
+                location == null || location.isBlank() ? user.getLocation() : location,
+                "Location");
+        String sanitizedStatus = ValidationUtil.requireStatus(status);
         String requestId = generateUniqueId("REQ", "purchase_requests", "purchase_request_id");
         String timestamp = Instant.now().toString();
 
@@ -265,19 +310,22 @@ public class MarketplaceDatabase {
                 PreparedStatement statement = connection.prepareStatement(
                         """
                         INSERT INTO purchase_requests
-                        (purchase_request_id, owner_user_id, buyer_name, city, phone, crop_type, quantity_kg, max_budget, notes, created_at)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        (purchase_request_id, owner_user_id, buyer_name, city, phone, crop_type, quantity_kg, unit,
+                         max_budget, notes, status, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """)) {
             statement.setString(1, requestId);
             statement.setString(2, user.getUserId());
             statement.setString(3, user.getFullName());
-            statement.setString(4, user.getCity());
+            statement.setString(4, sanitizedLocation);
             statement.setString(5, user.getPhone());
             statement.setString(6, sanitizedCropType);
             statement.setInt(7, sanitizedQuantity);
-            statement.setDouble(8, sanitizedBudget);
-            statement.setString(9, ValidationUtil.optionalText(notes, 280));
-            statement.setString(10, timestamp);
+            statement.setString(8, sanitizedUnit);
+            statement.setDouble(9, sanitizedBudget);
+            statement.setString(10, ValidationUtil.optionalText(notes, 500));
+            statement.setString(11, sanitizedStatus);
+            statement.setString(12, timestamp);
             statement.executeUpdate();
         }
 
@@ -285,16 +333,22 @@ public class MarketplaceDatabase {
     }
 
     public List<CropPost> getCropPosts(String ownerUserId, String cropType, String city) throws SQLException {
+        return getCropPosts(ownerUserId, cropType, city, null, null, "");
+    }
+
+    public List<CropPost> getCropPosts(String ownerUserId, String cropType, String city, Integer minQuantity,
+            Double maxPrice, String status) throws SQLException {
         List<CropPost> cropPosts = new ArrayList<>();
-        List<String> parameters = new ArrayList<>();
+        List<Object> parameters = new ArrayList<>();
         StringBuilder query = new StringBuilder(
                 """
-                SELECT crop_post_id, owner_user_id, seller_name, city, phone, crop_type, quantity_kg, price_per_kg, notes, created_at
+                SELECT crop_post_id, owner_user_id, seller_name, city, phone, crop_type, quantity_kg, unit,
+                       price_per_kg, notes, status, created_at
                 FROM crop_posts
                 WHERE 1 = 1
                 """);
 
-        if (ownerUserId != null) {
+        if (ownerUserId != null && !ownerUserId.isBlank()) {
             query.append(" AND owner_user_id = ?");
             parameters.add(ownerUserId);
         }
@@ -306,13 +360,23 @@ public class MarketplaceDatabase {
             query.append(" AND LOWER(city) = ?");
             parameters.add(city.trim().toLowerCase(Locale.ENGLISH));
         }
+        if (minQuantity != null) {
+            query.append(" AND quantity_kg >= ?");
+            parameters.add(minQuantity);
+        }
+        if (maxPrice != null) {
+            query.append(" AND price_per_kg <= ?");
+            parameters.add(maxPrice);
+        }
+        if (status != null && !status.isBlank()) {
+            query.append(" AND LOWER(status) = ?");
+            parameters.add(status.trim().toLowerCase(Locale.ENGLISH));
+        }
         query.append(" ORDER BY created_at DESC");
 
         try (Connection connection = openConnection();
                 PreparedStatement statement = connection.prepareStatement(query.toString())) {
-            for (int index = 0; index < parameters.size(); index++) {
-                statement.setString(index + 1, parameters.get(index));
-            }
+            bindParameters(statement, parameters);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     cropPosts.add(mapCropPost(resultSet));
@@ -325,16 +389,22 @@ public class MarketplaceDatabase {
 
     public List<PurchaseRequest> getPurchaseRequests(String ownerUserId, String cropType, String city)
             throws SQLException {
+        return getPurchaseRequests(ownerUserId, cropType, city, null, null, "");
+    }
+
+    public List<PurchaseRequest> getPurchaseRequests(String ownerUserId, String cropType, String city,
+            Integer minQuantity, Double maxBudget, String status) throws SQLException {
         List<PurchaseRequest> purchaseRequests = new ArrayList<>();
-        List<String> parameters = new ArrayList<>();
+        List<Object> parameters = new ArrayList<>();
         StringBuilder query = new StringBuilder(
                 """
-                SELECT purchase_request_id, owner_user_id, buyer_name, city, phone, crop_type, quantity_kg, max_budget, notes, created_at
+                SELECT purchase_request_id, owner_user_id, buyer_name, city, phone, crop_type, quantity_kg, unit,
+                       max_budget, notes, status, created_at
                 FROM purchase_requests
                 WHERE 1 = 1
                 """);
 
-        if (ownerUserId != null) {
+        if (ownerUserId != null && !ownerUserId.isBlank()) {
             query.append(" AND owner_user_id = ?");
             parameters.add(ownerUserId);
         }
@@ -346,13 +416,23 @@ public class MarketplaceDatabase {
             query.append(" AND LOWER(city) = ?");
             parameters.add(city.trim().toLowerCase(Locale.ENGLISH));
         }
+        if (minQuantity != null) {
+            query.append(" AND quantity_kg >= ?");
+            parameters.add(minQuantity);
+        }
+        if (maxBudget != null) {
+            query.append(" AND max_budget <= ?");
+            parameters.add(maxBudget);
+        }
+        if (status != null && !status.isBlank()) {
+            query.append(" AND LOWER(status) = ?");
+            parameters.add(status.trim().toLowerCase(Locale.ENGLISH));
+        }
         query.append(" ORDER BY created_at DESC");
 
         try (Connection connection = openConnection();
                 PreparedStatement statement = connection.prepareStatement(query.toString())) {
-            for (int index = 0; index < parameters.size(); index++) {
-                statement.setString(index + 1, parameters.get(index));
-            }
+            bindParameters(statement, parameters);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     purchaseRequests.add(mapPurchaseRequest(resultSet));
@@ -365,12 +445,14 @@ public class MarketplaceDatabase {
 
     public DashboardSnapshot buildDashboard(String userId) throws SQLException, InvalidDataException {
         AccountUser user = requireUser(userId);
-        List<CropPost> ownCropPosts = getCropPosts(userId, "", "");
-        List<PurchaseRequest> ownPurchaseRequests = getPurchaseRequests(userId, "", "");
-        List<CropPost> allCropPosts = getCropPosts(null, "", "");
-        List<PurchaseRequest> allPurchaseRequests = getPurchaseRequests(null, "", "");
-        List<ActivityEntry> recentActivity = buildRecentActivity(ownCropPosts, ownPurchaseRequests, 6);
-        List<MatchRecord> topMatches = buildUserMatches(userId, allCropPosts, allPurchaseRequests, 5);
+        List<CropPost> ownCropPosts = getCropPosts(userId, "", "", null, null, AppConstants.DEFAULT_STATUS);
+        List<PurchaseRequest> ownPurchaseRequests = getPurchaseRequests(userId, "", "", null, null,
+                AppConstants.DEFAULT_STATUS);
+        List<CropPost> allCropPosts = getCropPosts(null, "", "", null, null, AppConstants.DEFAULT_STATUS);
+        List<PurchaseRequest> allPurchaseRequests = getPurchaseRequests(null, "", "", null, null,
+                AppConstants.DEFAULT_STATUS);
+        List<ActivityEntry> recentActivity = getRecentActivity(userId, 6);
+        List<MatchRecord> topMatches = getUserMatches(userId, 5);
 
         return new DashboardSnapshot(
                 user,
@@ -383,6 +465,21 @@ public class MarketplaceDatabase {
                 topMatches);
     }
 
+    public List<ActivityEntry> getRecentActivity(String userId, int limit) throws SQLException, InvalidDataException {
+        requireUser(userId);
+        List<CropPost> ownCropPosts = getCropPosts(userId, "", "", null, null, "");
+        List<PurchaseRequest> ownPurchaseRequests = getPurchaseRequests(userId, "", "", null, null, "");
+        return buildRecentActivity(ownCropPosts, ownPurchaseRequests, limit);
+    }
+
+    public List<MatchRecord> getUserMatches(String userId, int limit) throws SQLException, InvalidDataException {
+        requireUser(userId);
+        List<CropPost> allCropPosts = getCropPosts(null, "", "", null, null, AppConstants.DEFAULT_STATUS);
+        List<PurchaseRequest> allPurchaseRequests = getPurchaseRequests(null, "", "", null, null,
+                AppConstants.DEFAULT_STATUS);
+        return buildUserMatches(userId, allCropPosts, allPurchaseRequests, limit);
+    }
+
     private AccountUser requireUser(String userId) throws SQLException, InvalidDataException {
         AccountUser user = getUserById(userId);
         if (user == null) {
@@ -391,11 +488,18 @@ public class MarketplaceDatabase {
         return user;
     }
 
+    private void requireRoleAccess(AccountUser user, String blockedRole, String message) throws InvalidDataException {
+        if (user.getRole() != null && user.getRole().equalsIgnoreCase(blockedRole)) {
+            throw new InvalidDataException(message);
+        }
+    }
+
     private CropPost getCropPostById(String cropPostId) throws SQLException {
         try (Connection connection = openConnection();
                 PreparedStatement statement = connection.prepareStatement(
                         """
-                        SELECT crop_post_id, owner_user_id, seller_name, city, phone, crop_type, quantity_kg, price_per_kg, notes, created_at
+                        SELECT crop_post_id, owner_user_id, seller_name, city, phone, crop_type, quantity_kg, unit,
+                               price_per_kg, notes, status, created_at
                         FROM crop_posts
                         WHERE crop_post_id = ?
                         """)) {
@@ -413,7 +517,8 @@ public class MarketplaceDatabase {
         try (Connection connection = openConnection();
                 PreparedStatement statement = connection.prepareStatement(
                         """
-                        SELECT purchase_request_id, owner_user_id, buyer_name, city, phone, crop_type, quantity_kg, max_budget, notes, created_at
+                        SELECT purchase_request_id, owner_user_id, buyer_name, city, phone, crop_type, quantity_kg, unit,
+                               max_budget, notes, status, created_at
                         FROM purchase_requests
                         WHERE purchase_request_id = ?
                         """)) {
@@ -436,8 +541,11 @@ public class MarketplaceDatabase {
                     "crop-post",
                     cropPost.getCropPostId(),
                     "Added " + cropPost.getCropType() + " listing",
-                    cropPost.getQuantityKg() + " kg at Rs. "
-                            + String.format("%.2f", cropPost.getPricePerKg()) + " per kg",
+                    cropPost.getQuantityKg() + " " + cropPost.getUnit() + " at Rs. "
+                            + String.format(Locale.ENGLISH, "%.2f", cropPost.getPricePerKg()) + " per "
+                            + cropPost.getUnit(),
+                    cropPost.getStatus(),
+                    "View listing",
                     cropPost.getCreatedAt(),
                     "/add-crops"));
         }
@@ -447,17 +555,21 @@ public class MarketplaceDatabase {
                     "purchase-request",
                     purchaseRequest.getPurchaseRequestId(),
                     "Requested " + purchaseRequest.getCropType(),
-                    purchaseRequest.getQuantityKg() + " kg up to Rs. "
-                            + String.format("%.2f", purchaseRequest.getMaxBudget()) + " per kg",
+                    purchaseRequest.getQuantityKg() + " " + purchaseRequest.getUnit() + " up to Rs. "
+                            + String.format(Locale.ENGLISH, "%.2f", purchaseRequest.getMaxBudget()) + " per "
+                            + purchaseRequest.getUnit(),
+                    purchaseRequest.getStatus(),
+                    "Review request",
                     purchaseRequest.getCreatedAt(),
                     "/buy-crops"));
         }
 
         activityEntries.sort(Comparator.comparing(ActivityEntry::getCreatedAt).reversed());
-        if (activityEntries.size() <= limit) {
+        int safeLimit = Math.max(1, limit);
+        if (activityEntries.size() <= safeLimit) {
             return activityEntries;
         }
-        return new ArrayList<>(activityEntries.subList(0, limit));
+        return new ArrayList<>(activityEntries.subList(0, safeLimit));
     }
 
     private List<MatchRecord> buildUserMatches(String userId, List<CropPost> cropPosts,
@@ -466,7 +578,13 @@ public class MarketplaceDatabase {
         Set<String> seenPairs = new HashSet<>();
 
         for (PurchaseRequest purchaseRequest : purchaseRequests) {
+            if (!AppConstants.DEFAULT_STATUS.equalsIgnoreCase(purchaseRequest.getStatus())) {
+                continue;
+            }
             for (CropPost cropPost : cropPosts) {
+                if (!AppConstants.DEFAULT_STATUS.equalsIgnoreCase(cropPost.getStatus())) {
+                    continue;
+                }
                 if (purchaseRequest.getOwnerUserId() == null && cropPost.getOwnerUserId() == null) {
                     continue;
                 }
@@ -489,21 +607,32 @@ public class MarketplaceDatabase {
                 }
 
                 String pairKey = buyer.getId() + "|" + farmer.getId();
-                if (seenPairs.add(pairKey)) {
-                    matches.add(new MatchRecord(
-                            buyer,
-                            farmer,
-                            farmer.calculateMatchScore(buyer),
-                            "Match Ready"));
+                if (!seenPairs.add(pairKey)) {
+                    continue;
                 }
+
+                double score = calculateMatchScore(farmer, buyer);
+                String status = score >= 92 ? "high confidence" : "good fit";
+                matches.add(new MatchRecord(buyer, farmer, score, status));
             }
         }
 
         matches.sort(Comparator.naturalOrder());
-        if (matches.size() <= limit) {
+        int safeLimit = Math.max(1, limit);
+        if (matches.size() <= safeLimit) {
             return matches;
         }
-        return new ArrayList<>(matches.subList(0, limit));
+        return new ArrayList<>(matches.subList(0, safeLimit));
+    }
+
+    private double calculateMatchScore(Farmer farmer, Buyer buyer) {
+        double score = farmer.calculateMatchScore(buyer);
+        double budgetGap = Math.max(0, buyer.getMaxBudget() - farmer.getPricePerUnit());
+        if (buyer.getMaxBudget() > 0) {
+            double priceAlignment = Math.min(10, (budgetGap / buyer.getMaxBudget()) * 10);
+            score += priceAlignment;
+        }
+        return Math.round(Math.min(99.5, score) * 100.0) / 100.0;
     }
 
     private Farmer toFarmer(CropPost cropPost) throws InvalidDataException {
@@ -554,6 +683,7 @@ public class MarketplaceDatabase {
                         email TEXT NOT NULL UNIQUE,
                         city TEXT NOT NULL,
                         phone TEXT NOT NULL,
+                        role TEXT NOT NULL DEFAULT 'both',
                         password_hash TEXT NOT NULL,
                         password_salt TEXT NOT NULL,
                         created_at TEXT NOT NULL,
@@ -580,8 +710,10 @@ public class MarketplaceDatabase {
                         phone TEXT NOT NULL,
                         crop_type TEXT NOT NULL,
                         quantity_kg INTEGER NOT NULL,
+                        unit TEXT NOT NULL DEFAULT 'kg',
                         price_per_kg REAL NOT NULL,
                         notes TEXT NOT NULL DEFAULT '',
+                        status TEXT NOT NULL DEFAULT 'active',
                         created_at TEXT NOT NULL,
                         FOREIGN KEY(owner_user_id) REFERENCES users(user_id) ON DELETE SET NULL
                     )
@@ -596,12 +728,45 @@ public class MarketplaceDatabase {
                         phone TEXT NOT NULL,
                         crop_type TEXT NOT NULL,
                         quantity_kg INTEGER NOT NULL,
+                        unit TEXT NOT NULL DEFAULT 'kg',
                         max_budget REAL NOT NULL,
                         notes TEXT NOT NULL DEFAULT '',
+                        status TEXT NOT NULL DEFAULT 'active',
                         created_at TEXT NOT NULL,
                         FOREIGN KEY(owner_user_id) REFERENCES users(user_id) ON DELETE SET NULL
                     )
                     """);
+        }
+
+        ensureColumn(connection, "users", "role", "TEXT NOT NULL DEFAULT 'both'");
+        ensureColumn(connection, "crop_posts", "unit", "TEXT NOT NULL DEFAULT 'kg'");
+        ensureColumn(connection, "crop_posts", "status", "TEXT NOT NULL DEFAULT 'active'");
+        ensureColumn(connection, "purchase_requests", "unit", "TEXT NOT NULL DEFAULT 'kg'");
+        ensureColumn(connection, "purchase_requests", "status", "TEXT NOT NULL DEFAULT 'active'");
+
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_crop_posts_search "
+                            + "ON crop_posts (crop_type, city, status, quantity_kg, price_per_kg)");
+            statement.execute(
+                    "CREATE INDEX IF NOT EXISTS idx_purchase_requests_search "
+                            + "ON purchase_requests (crop_type, city, status, quantity_kg, max_budget)");
+        }
+    }
+
+    private void ensureColumn(Connection connection, String tableName, String columnName, String definition)
+            throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("PRAGMA table_info(" + tableName + ")");
+                ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                if (columnName.equalsIgnoreCase(resultSet.getString("name"))) {
+                    return;
+                }
+            }
+        }
+
+        try (Statement alterStatement = connection.createStatement()) {
+            alterStatement.execute("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + definition);
         }
     }
 
@@ -625,14 +790,16 @@ public class MarketplaceDatabase {
             try (PreparedStatement cropStatement = connection.prepareStatement(
                     """
                     INSERT INTO crop_posts
-                    (crop_post_id, owner_user_id, seller_name, city, phone, crop_type, quantity_kg, price_per_kg, notes, created_at)
-                    VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?)
+                    (crop_post_id, owner_user_id, seller_name, city, phone, crop_type, quantity_kg, unit,
+                     price_per_kg, notes, status, created_at)
+                    VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """);
                     PreparedStatement purchaseStatement = connection.prepareStatement(
                             """
                             INSERT INTO purchase_requests
-                            (purchase_request_id, owner_user_id, buyer_name, city, phone, crop_type, quantity_kg, max_budget, notes, created_at)
-                            VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?)
+                            (purchase_request_id, owner_user_id, buyer_name, city, phone, crop_type, quantity_kg, unit,
+                             max_budget, notes, status, created_at)
+                            VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             """)) {
                 String timestamp = Instant.now().toString();
                 for (farmmarket.model.Farmer farmer : farmers) {
@@ -642,9 +809,11 @@ public class MarketplaceDatabase {
                     cropStatement.setString(4, farmer.getPhone());
                     cropStatement.setString(5, farmer.getCropType());
                     cropStatement.setInt(6, farmer.getQuantityAvailable());
-                    cropStatement.setDouble(7, farmer.getPricePerUnit());
-                    cropStatement.setString(8, "Imported marketplace seed data");
-                    cropStatement.setString(9, timestamp);
+                    cropStatement.setString(7, AppConstants.DEFAULT_UNIT);
+                    cropStatement.setDouble(8, farmer.getPricePerUnit());
+                    cropStatement.setString(9, "Imported marketplace seed data");
+                    cropStatement.setString(10, AppConstants.DEFAULT_STATUS);
+                    cropStatement.setString(11, timestamp);
                     cropStatement.addBatch();
                 }
                 for (farmmarket.model.Buyer buyer : buyers) {
@@ -654,9 +823,11 @@ public class MarketplaceDatabase {
                     purchaseStatement.setString(4, buyer.getPhone());
                     purchaseStatement.setString(5, buyer.getRequiredCrop());
                     purchaseStatement.setInt(6, buyer.getRequiredQuantity());
-                    purchaseStatement.setDouble(7, buyer.getMaxBudget());
-                    purchaseStatement.setString(8, "Imported marketplace seed data");
-                    purchaseStatement.setString(9, timestamp);
+                    purchaseStatement.setString(7, AppConstants.DEFAULT_UNIT);
+                    purchaseStatement.setDouble(8, buyer.getMaxBudget());
+                    purchaseStatement.setString(9, "Imported marketplace seed data");
+                    purchaseStatement.setString(10, AppConstants.DEFAULT_STATUS);
+                    purchaseStatement.setString(11, timestamp);
                     purchaseStatement.addBatch();
                 }
                 cropStatement.executeBatch();
@@ -677,6 +848,20 @@ public class MarketplaceDatabase {
         try (Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery("SELECT COUNT(*) FROM " + tableName)) {
             return resultSet.next() && resultSet.getInt(1) > 0;
+        }
+    }
+
+    private void bindParameters(PreparedStatement statement, List<Object> parameters) throws SQLException {
+        for (int index = 0; index < parameters.size(); index++) {
+            Object parameter = parameters.get(index);
+            int position = index + 1;
+            if (parameter instanceof Integer integer) {
+                statement.setInt(position, integer);
+            } else if (parameter instanceof Double number) {
+                statement.setDouble(position, number);
+            } else {
+                statement.setString(position, String.valueOf(parameter));
+            }
         }
     }
 
@@ -708,6 +893,7 @@ public class MarketplaceDatabase {
                 resultSet.getString("email"),
                 resultSet.getString("city"),
                 resultSet.getString("phone"),
+                resultSet.getString("role"),
                 resultSet.getString("created_at"),
                 resultSet.getString("updated_at"));
     }
@@ -721,8 +907,10 @@ public class MarketplaceDatabase {
                 resultSet.getString("phone"),
                 resultSet.getString("crop_type"),
                 resultSet.getInt("quantity_kg"),
+                resultSet.getString("unit"),
                 resultSet.getDouble("price_per_kg"),
                 resultSet.getString("notes"),
+                resultSet.getString("status"),
                 resultSet.getString("created_at"));
     }
 
@@ -735,8 +923,10 @@ public class MarketplaceDatabase {
                 resultSet.getString("phone"),
                 resultSet.getString("crop_type"),
                 resultSet.getInt("quantity_kg"),
+                resultSet.getString("unit"),
                 resultSet.getDouble("max_budget"),
                 resultSet.getString("notes"),
+                resultSet.getString("status"),
                 resultSet.getString("created_at"));
     }
 }
