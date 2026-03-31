@@ -6,16 +6,18 @@ public class AccountUser {
     private final String email;
     private final String city;
     private final String phone;
+    private final String role;
     private final String createdAt;
     private final String updatedAt;
 
-    public AccountUser(String userId, String fullName, String email, String city, String phone, String createdAt,
-            String updatedAt) {
+    public AccountUser(String userId, String fullName, String email, String city, String phone, String role,
+            String createdAt, String updatedAt) {
         this.userId = userId;
         this.fullName = fullName;
         this.email = email;
         this.city = city;
         this.phone = phone;
+        this.role = role;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -36,8 +38,16 @@ public class AccountUser {
         return city;
     }
 
+    public String getLocation() {
+        return city;
+    }
+
     public String getPhone() {
         return phone;
+    }
+
+    public String getRole() {
+        return role;
     }
 
     public String getCreatedAt() {

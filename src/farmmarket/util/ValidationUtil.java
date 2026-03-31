@@ -1,5 +1,6 @@
 package farmmarket.util;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -73,6 +74,56 @@ public final class ValidationUtil {
             throw new InvalidDataException(fieldName + " must be at least " + minLength + " characters.");
         }
         return sanitizedValue;
+    }
+
+    public static double requirePositiveDouble(double value, String fieldName) throws InvalidDataException {
+        if (value <= 0) {
+            throw new InvalidDataException(fieldName + " must be greater than zero.");
+        }
+        return value;
+    }
+
+    public static String requireAllowedValue(String value, String fieldName, String[] allowedValues)
+            throws InvalidDataException {
+        String sanitizedValue = requireNonEmpty(value, fieldName).toLowerCase(Locale.ENGLISH);
+        boolean allowed = Arrays.stream(allowedValues)
+                .anyMatch(candidate -> candidate.equalsIgnoreCase(sanitizedValue));
+        if (!allowed) {
+            throw new InvalidDataException(fieldName + " is not supported.");
+        }
+        return sanitizedValue;
+    }
+
+    public static String requireCropType(String value) throws InvalidDataException {
+        String sanitizedValue = requireNonEmpty(value, "Crop type");
+        boolean allowed = Arrays.stream(AppConstants.CROP_TYPES)
+                .anyMatch(candidate -> candidate.equalsIgnoreCase(sanitizedValue));
+        if (!allowed) {
+            throw new InvalidDataException("Crop type is not supported.");
+        }
+        return sanitizedValue;
+    }
+
+    public static String requireRole(String value) throws InvalidDataException {
+        return requireAllowedValue(value == null ? AppConstants.DEFAULT_USER_ROLE : value,
+                "Role", AppConstants.USER_ROLES);
+    }
+
+    public static String requireUnit(String value) throws InvalidDataException {
+        return requireAllowedValue(value == null ? AppConstants.DEFAULT_UNIT : value,
+                "Unit", AppConstants.SUPPORTED_UNITS);
+    }
+
+    public static String requireStatus(String value) throws InvalidDataException {
+        return requireAllowedValue(value == null ? AppConstants.DEFAULT_STATUS : value,
+                "Status", AppConstants.LISTING_STATUSES);
+    }
+
+    public static String requireOptionalStatus(String value) throws InvalidDataException {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+        return requireStatus(value);
     }
 
     public static String optionalText(String value, int maxLength) {
