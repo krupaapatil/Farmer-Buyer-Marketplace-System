@@ -19,11 +19,11 @@ export const DEFAULT_ROLES = ["farmer", "buyer", "both"];
 export const ROUTE_META = {
   "/dashboard": {
     title: "Home Dashboard",
-    subtitle: "Track live opportunities, active demand, and the activity that moves your marketplace forward."
+    subtitle: ""
   },
   "/add-crops": {
     title: "Add Crops",
-    subtitle: "Create polished listings with validation, then review buyer demand from the same workspace."
+    subtitle: ""
   },
   "/buy-crops": {
     title: "Buy Crops",

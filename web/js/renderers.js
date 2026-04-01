@@ -129,7 +129,7 @@ function renderHeroCard(state) {
       <div class="hero-card__content">
         <span class="eyebrow eyebrow--light">Harvest Hub</span>
         <h1>${escapeHtml(meta.title)}</h1>
-        <p>${escapeHtml(meta.subtitle)}</p>
+        ${meta.subtitle ? `<p>${escapeHtml(meta.subtitle)}</p>` : ""}
         <div class="hero-card__actions">
           <button type="button" class="button button--primary" data-route="/add-crops">Create Listing</button>
           <button type="button" class="button button--secondary" data-route="/buy-crops">Browse Supply</button>
@@ -184,7 +184,7 @@ function renderEmptyState({ icon, title, body, actionLabel, actionRoute }) {
     <div class="empty-state-card">
       <div class="empty-state-card__icon" aria-hidden="true">${icon}</div>
       <h3>${escapeHtml(title)}</h3>
-      <p>${escapeHtml(body)}</p>
+      ${body ? `<p>${escapeHtml(body)}</p>` : ""}
       ${actionLabel ? `<button type="button" class="button button--primary" data-route="${actionRoute}">${escapeHtml(actionLabel)}</button>` : ""}
     </div>
   `;
@@ -376,7 +376,7 @@ function renderDashboard(state) {
           : renderEmptyState({
               icon: "🌾",
               title: "No polished matches yet",
-              body: "As soon as compatible listings and requests line up, your strongest opportunities will appear here with confidence scores and clear next steps.",
+              body: "",
               actionLabel: emptyAction.label,
               actionRoute: emptyAction.route
             })}
@@ -389,7 +389,7 @@ function renderDashboard(state) {
           : renderEmptyState({
               icon: "📌",
               title: "Your timeline is still empty",
-              body: "Create a listing or a request to start building a clean activity history that you can revisit later.",
+              body: "",
               actionLabel: "Create Listing",
               actionRoute: "/add-crops"
             })}
@@ -402,7 +402,7 @@ function renderFormIntro(title, body) {
   return `
     <div class="card-intro">
       <h2>${escapeHtml(title)}</h2>
-      <p>${escapeHtml(body)}</p>
+      ${body ? `<p>${escapeHtml(body)}</p>` : ""}
     </div>
   `;
 }
@@ -425,7 +425,7 @@ function renderAddCropsPage(state) {
     ${renderHeroCard(state)}
     <section class="page-grid">
       <article class="surface-card">
-        ${renderFormIntro("Create crop listing", "Labels stay above each field, validation runs inline, and your listing inherits your saved profile details by default.")}
+        ${renderFormIntro("Create crop listing", "")}
         <form id="cropForm" class="stack-form">
           ${renderSelectField({ label: "Crop type", name: "cropType", required: true, value: "", options: [{ value: "", label: "Select crop type" }].concat((catalog.cropTypes || DEFAULT_CROP_TYPES).map((crop) => ({ value: crop, label: crop }))) })}
           <div class="form-row">
@@ -485,7 +485,7 @@ function renderBuyCropsPage(state) {
     ${renderHeroCard(state)}
     <section class="page-grid">
       <article class="surface-card">
-        ${renderFormIntro("Create purchase request", "Use clean quantities, units, budget, and location details so sellers can match your demand quickly.")}
+        ${renderFormIntro("Create purchase request", "")}
         <form id="purchaseForm" class="stack-form">
           ${renderSelectField({ label: "Crop type", name: "cropType", required: true, value: "", options: [{ value: "", label: "Select crop type" }].concat((catalog.cropTypes || DEFAULT_CROP_TYPES).map((crop) => ({ value: crop, label: crop }))) })}
           <div class="form-row">
@@ -578,7 +578,6 @@ function renderAuthPage(mode) {
         <div class="auth-visual__inner">
           <span class="eyebrow eyebrow--light">Responsive marketplace</span>
           <h1>Harvest Hub</h1>
-          <p>One clean workspace for growers and buyers, with consistent navigation, data-driven dashboards, and forms built for real use on desktop and mobile.</p>
         </div>
       </section>
 
