@@ -27,11 +27,11 @@ export const ROUTE_META = {
   },
   "/buy-crops": {
     title: "Buy Crops",
-    subtitle: "Post structured purchase requests and review current supply without switching layouts."
+    subtitle: ""
   },
   "/profile": {
     title: "Profile",
-    subtitle: "Keep your account, role, and contact details ready for every listing and request."
+    subtitle: ""
   }
 };
 

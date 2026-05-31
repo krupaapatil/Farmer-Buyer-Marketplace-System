@@ -174,7 +174,7 @@ function renderStatCard(label, value, detail) {
     <article class="stat-card">
       <span>${escapeHtml(formatNumber(value))}</span>
       <strong>${escapeHtml(label)}</strong>
-      <p>${escapeHtml(detail)}</p>
+      ${detail ? `<p>${escapeHtml(detail)}</p>` : ""}
     </article>
   `;
 }
@@ -361,11 +361,11 @@ function renderDashboard(state) {
   return `
     ${renderHeroCard(state)}
     <section class="stats-grid">
-      ${renderStatCard("Your Listings", stats.cropPosts || 0, "Active crop posts created by you")}
-      ${renderStatCard("Your Requests", stats.purchaseRequests || 0, "Purchase requests currently open")}
-      ${renderStatCard("Market Listings", stats.marketplaceCrops || 0, "Visible crop supply across the market")}
-      ${renderStatCard("Buyer Demand", stats.marketplaceDemand || 0, "Open requests from active buyers")}
-      ${renderStatCard("Top Matches", stats.availableMatches || 0, "High-fit matches involving your account")}
+      ${renderStatCard("Your Listings", stats.cropPosts || 0)}
+      ${renderStatCard("Your Requests", stats.purchaseRequests || 0)}
+      ${renderStatCard("Market Listings", stats.marketplaceCrops || 0)}
+      ${renderStatCard("Buyer Demand", stats.marketplaceDemand || 0)}
+      ${renderStatCard("Top Matches", stats.availableMatches || 0)}
     </section>
 
     <section class="dashboard-grid">
