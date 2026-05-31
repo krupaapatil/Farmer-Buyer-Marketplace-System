@@ -584,7 +584,6 @@ function renderAuthPage(mode) {
       <section class="auth-panel">
         <div class="card-intro">
           <h2>${isSignup ? "Create your account" : "Log in to continue"}</h2>
-          <p>${isSignup ? "Choose your role, keep your location current, and land directly inside the responsive dashboard." : "Your dashboard, matches, activity history, and saved profile will be ready when you sign in."}</p>
         </div>
 
         <form id="${isSignup ? "signupForm" : "loginForm"}" class="stack-form">
